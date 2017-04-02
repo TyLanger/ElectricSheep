@@ -48,18 +48,17 @@ public class PlayerController : MonoBehaviour {
 			// right
 			if (facing != Facing.right) {
 				facing = Facing.right;
-			} else {
-				if (grid.canMoveToGrid (xGridPos + 1, zGridPos)) {
-					// if nothing occupying that space
-					// move right
-					// if this isn't out of bounds, it will set movePos to the vec3 position of that grid space
-					if (grid.gridToVec3 (xGridPos + 1, zGridPos, out tempMovePos)) {
-						// success
-						xGridPos += 1;
-						movePos = tempMovePos;
-						// -1 in first place because already updated gridPos
-						grid.moveOnGrid (xGridPos - 1, zGridPos, xGridPos, zGridPos);
-					}
+			}
+			if (grid.canMoveToGrid (xGridPos + 1, zGridPos)) {
+				// if nothing occupying that space
+				// move right
+				// if this isn't out of bounds, it will set movePos to the vec3 position of that grid space
+				if (grid.gridToVec3 (xGridPos + 1, zGridPos, out tempMovePos)) {
+					// success
+					xGridPos += 1;
+					movePos = tempMovePos;
+					// -1 in first place because already updated gridPos
+					grid.moveOnGrid (xGridPos - 1, zGridPos, xGridPos, zGridPos);
 				}
 			}
 		}
@@ -68,16 +67,15 @@ public class PlayerController : MonoBehaviour {
 			// left
 			if (facing != Facing.left) {
 				facing = Facing.left;
-			} else {
-				if (grid.canMoveToGrid (xGridPos - 1, zGridPos)) {
-					// if nothing occupying that space
-					// move left
-					if (grid.gridToVec3 (xGridPos - 1, zGridPos, out tempMovePos)) {
-						xGridPos -= 1;
-						movePos = tempMovePos;
-						// -1 in first place because already updated gridPos
-						grid.moveOnGrid (xGridPos + 1, zGridPos, xGridPos, zGridPos);
-					}
+			}
+			if (grid.canMoveToGrid (xGridPos - 1, zGridPos)) {
+				// if nothing occupying that space
+				// move left
+				if (grid.gridToVec3 (xGridPos - 1, zGridPos, out tempMovePos)) {
+					xGridPos -= 1;
+					movePos = tempMovePos;
+					// -1 in first place because already updated gridPos
+					grid.moveOnGrid (xGridPos + 1, zGridPos, xGridPos, zGridPos);
 				}
 			}
 		}
@@ -86,16 +84,15 @@ public class PlayerController : MonoBehaviour {
 			// up
 			if (facing != Facing.up) {
 				facing = Facing.up;
-			} else {
-				if (grid.canMoveToGrid (xGridPos, zGridPos + 1)) {
-					// if nothing occupying that space
-					// move left
-					if (grid.gridToVec3 (xGridPos, zGridPos + 1, out tempMovePos)) {
-						zGridPos += 1;
-						movePos = tempMovePos;
-						// -1 in first place because already updated gridPos
-						grid.moveOnGrid (xGridPos, zGridPos - 1, xGridPos, zGridPos);
-					}
+			}
+			if (grid.canMoveToGrid (xGridPos, zGridPos + 1)) {
+				// if nothing occupying that space
+				// move left
+				if (grid.gridToVec3 (xGridPos, zGridPos + 1, out tempMovePos)) {
+					zGridPos += 1;
+					movePos = tempMovePos;
+					// -1 in first place because already updated gridPos
+					grid.moveOnGrid (xGridPos, zGridPos - 1, xGridPos, zGridPos);
 				}
 			}
 		}
@@ -104,16 +101,15 @@ public class PlayerController : MonoBehaviour {
 			// down
 			if (facing != Facing.down) {
 				facing = Facing.down;
-			} else {
-				if (grid.canMoveToGrid (xGridPos, zGridPos - 1)) {
-					// if nothing occupying that space
-					// move left
-					if (grid.gridToVec3 (xGridPos, zGridPos - 1, out tempMovePos)) {
-						zGridPos -= 1;
-						movePos = tempMovePos;
-						// -1 in first place because already updated gridPos
-						grid.moveOnGrid (xGridPos, zGridPos + 1, xGridPos, zGridPos);
-					}
+			} 
+			if (grid.canMoveToGrid (xGridPos, zGridPos - 1)) {
+				// if nothing occupying that space
+				// move left
+				if (grid.gridToVec3 (xGridPos, zGridPos - 1, out tempMovePos)) {
+					zGridPos -= 1;
+					movePos = tempMovePos;
+					// -1 in first place because already updated gridPos
+					grid.moveOnGrid (xGridPos, zGridPos + 1, xGridPos, zGridPos);
 				}
 			}
 		}
