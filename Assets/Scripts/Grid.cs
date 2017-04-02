@@ -5,22 +5,86 @@ using UnityEngine;
 public class Grid : MonoBehaviour {
 
 	Transform[,] grid;
-	int xGridSize;
-	int zGridSize;
+	int xGridSize = 5;
+	int zGridSize = 5;
 	public float gridSpacing;
 
 	void Start() {
 		grid = new Transform[xGridSize, zGridSize];
 	}
 
-	Vector3 gridToVec3(int xGrid, int zGrid)
+	void OnDrawGizmosSelected()
 	{
+		Vector3 pos;
+		for (int x = 0; x < xGridSize; x++) {
+			for (int z = 0; z < zGridSize; z++) {
+				gridToVec3 (x, z, out pos);
+				Gizmos.DrawSphere (pos, 0.1f);
+			}
+		}
+
+	}
+
+	/*
+	 * Hard to make these check for out of bounds and return the right thing.
+	 * Using out in later functions seems better
+	 * 
+	public Vector3 gridToVec3(int xGrid, int zGrid)
+	{
+		if ((xGrid >= xGridSize || xGrid < 0) || (zGrid >= zGridSize || zGrid < 0)) {
+			// out of bounds
+			// return something so they know they are out of bounds
+			return Vector3.one;
+		}
+			
 		return new Vector3 (xGrid * gridSpacing, 0, zGrid * gridSpacing) + transform.position;
 	}
 
-	Transform getTransformAtGrid(int xGrid, int zGrid)
+	public Transform getTransformAtGrid(int xGrid, int zGrid)
 	{
+		if ((xGrid >= xGridSize || xGrid < 0) || (zGrid >= zGridSize || zGrid < 0)) {
+			return null;
+		}
 		return grid [xGrid, zGrid];
 	}
+	*/
 
+	public bool gridToVec3(int xGrid, int zGrid, out Vector3 outVector)
+	{
+		if ((xGrid >= xGridSize || xGrid < 0) || (zGrid >= zGridSize || zGrid < 0)) {
+			outVector = Vector3.one;
+			return false;
+		}
+		outVector = new Vector3 (xGrid * gridSpacing, 0, zGrid * gridSpacing) + transform.position;
+		return true;
+	}
+
+	public bool getTransformAtGrid(int xGrid, int zGrid, out Transform outTrans)
+	{
+		if ((xGrid >= xGridSize || xGrid < 0) || (zGrid >= zGridSize || zGrid < 0)) {
+			outTrans = null;
+			return false;
+		}
+		outTrans = grid [xGrid, zGrid];
+		return true;
+	}
+
+	public bool canMoveToGrid(int xGrid, int zGrid)
+	{
+		/* getTransformAtGrid checks if out of bound already
+		if ((xGrid >= xGridSize || xGrid < 0) || (zGrid >= zGridSize || zGrid < 0)) {
+			// check out of bounds
+			return false;
+		}
+		*/
+
+		Transform trans;
+		if (getTransformAtGrid (xGrid, zGrid, out trans)) {
+			// if it's empty, then you can move there
+			if (trans == null) {
+				return true;
+			}
+		}
+		return false;
+	}
 }
