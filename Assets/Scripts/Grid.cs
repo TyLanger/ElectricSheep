@@ -9,7 +9,7 @@ public class Grid : MonoBehaviour {
 	int zGridSize = 5;
 	public float gridSpacing;
 
-	void Start() {
+	void Awake() {
 		grid = new Transform[xGridSize, zGridSize];
 	}
 
@@ -86,5 +86,42 @@ public class Grid : MonoBehaviour {
 			}
 		}
 		return false;
+	}
+
+	public bool moveOnGrid(int xCurrent, int zCurrent, int xChange, int zChange)
+	{
+		if (outOfBounds (xCurrent, zCurrent)) {
+			// current is out of bounds
+			return false;
+		}
+		if(outOfBounds(xCurrent + xChange, zCurrent + zChange))
+		{
+			// place moving to is out of bounds
+			return false;
+		}
+		grid [xCurrent + xChange, zCurrent + zChange] = grid [xCurrent, zCurrent];
+
+		grid [xCurrent, zCurrent] = null;
+		return true;
+	}
+
+	public bool addToGrid(int xPos, int zPos, Transform addTrans)
+	{
+		if (outOfBounds(xPos, zPos)) {
+			return false;
+		}
+		grid [xPos, zPos] = addTrans;
+		return true;
+	}
+
+	/// <summary>
+	/// Returns true if out of bounds
+	/// </summary>
+	/// <returns><c>true</c>, if of bounds was outed, <c>false</c> otherwise.</returns>
+	/// <param name="x">The x coordinate.</param>
+	/// <param name="z">The z coordinate.</param>
+	bool outOfBounds(int x, int z)
+	{
+		return ((x < 0 || x >= xGridSize) || (z < 0 || z >= zGridSize));
 	}
 }
