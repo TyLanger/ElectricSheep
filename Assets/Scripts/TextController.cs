@@ -7,15 +7,17 @@ public class TextController : MonoBehaviour {
 
 	public Transform cameraTrans;
 
-	public TextMesh[] textMeshes;
+	public TextMesh textMesh;
 	public string message;
 	public float letterSpacing;
+
+	public AnimationCurve xycurve;
 
 	// Use this for initialization
 	void Start () {
 		
 		for (int i = 0; i < message.Length; i++) {
-			var text = Instantiate (textMeshes[i], transform.position + new Vector3(i * letterSpacing, 0, 0), cameraTrans.rotation) as TextMesh;
+			var text = Instantiate (textMesh, transform.position + new Vector3(i * letterSpacing, xycurve.Evaluate((float)i/message.Length), 0), cameraTrans.rotation) as TextMesh;
 			text.text = message.Substring (i, 1);
 
 		}
