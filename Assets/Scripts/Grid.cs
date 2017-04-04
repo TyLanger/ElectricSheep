@@ -4,7 +4,9 @@ using UnityEngine;
 
 public class Grid : MonoBehaviour {
 
-	Transform[,] grid;
+	[SerializeField]
+	public Transform[,] grid;
+
 	int xGridSize = 5;
 	int zGridSize = 5;
 	public float gridSpacing;
@@ -65,6 +67,7 @@ public class Grid : MonoBehaviour {
 			outTrans = null;
 			return false;
 		}
+		// even if it's not out of bounds, it could still return null
 		outTrans = grid [xGrid, zGrid];
 		return true;
 	}
@@ -92,11 +95,13 @@ public class Grid : MonoBehaviour {
 	{
 		if (outOfBounds (xCurrent, zCurrent)) {
 			// current is out of bounds
+			Debug.Log("Out of bounds: "+xCurrent+", "+zCurrent+" + "+xChange+", "+zChange);
 			return false;
 		}
 		if(outOfBounds(xCurrent + xChange, zCurrent + zChange))
 		{
 			// place moving to is out of bounds
+			Debug.Log("Moving to out of bounds: "+xCurrent+", "+zCurrent+" + "+xChange+", "+zChange);
 			return false;
 		}
 		grid [xCurrent + xChange, zCurrent + zChange] = grid [xCurrent, zCurrent];
@@ -123,5 +128,14 @@ public class Grid : MonoBehaviour {
 	bool outOfBounds(int x, int z)
 	{
 		return ((x < 0 || x >= xGridSize) || (z < 0 || z >= zGridSize));
+	}
+
+	public void debugGrid()
+	{
+		for (int x = 0; x < xGridSize; x++) {
+			for (int z = 0; z < zGridSize; z++) {
+				Debug.Log (x + ", " + z + ": " + grid [x, z]);
+			}
+		}
 	}
 }

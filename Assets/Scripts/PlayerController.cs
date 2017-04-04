@@ -41,6 +41,10 @@ public class PlayerController : MonoBehaviour {
 	// Update is called once per frame
 	void Update () {
 
+		if (Input.GetKeyDown ("f")) {
+			grid.debugGrid ();
+		}
+
 		// not a huge fan of hard-coding the buttons like this, but this way you only move one space per button press
 		// with the hor and vert axis, you move multiple at a time and it's hard to control how many
 		if(Input.GetKeyDown("d"))
@@ -58,7 +62,7 @@ public class PlayerController : MonoBehaviour {
 					xGridPos += 1;
 					movePos = tempMovePos;
 					// -1 in first place because already updated gridPos
-					grid.moveOnGrid (xGridPos - 1, zGridPos, xGridPos, zGridPos);
+					grid.moveOnGrid (xGridPos - 1, zGridPos, 1, 0);
 				}
 			}
 		}
@@ -75,7 +79,7 @@ public class PlayerController : MonoBehaviour {
 					xGridPos -= 1;
 					movePos = tempMovePos;
 					// -1 in first place because already updated gridPos
-					grid.moveOnGrid (xGridPos + 1, zGridPos, xGridPos, zGridPos);
+					grid.moveOnGrid (xGridPos + 1, zGridPos, -1, 0);
 				}
 			}
 		}
@@ -87,12 +91,12 @@ public class PlayerController : MonoBehaviour {
 			}
 			if (grid.canMoveToGrid (xGridPos, zGridPos + 1)) {
 				// if nothing occupying that space
-				// move left
+				// move up
 				if (grid.gridToVec3 (xGridPos, zGridPos + 1, out tempMovePos)) {
 					zGridPos += 1;
 					movePos = tempMovePos;
 					// -1 in first place because already updated gridPos
-					grid.moveOnGrid (xGridPos, zGridPos - 1, xGridPos, zGridPos);
+					grid.moveOnGrid (xGridPos, zGridPos - 1, 0, 1);
 				}
 			}
 		}
@@ -109,7 +113,7 @@ public class PlayerController : MonoBehaviour {
 					zGridPos -= 1;
 					movePos = tempMovePos;
 					// -1 in first place because already updated gridPos
-					grid.moveOnGrid (xGridPos, zGridPos + 1, xGridPos, zGridPos);
+					grid.moveOnGrid (xGridPos, zGridPos + 1, 0, -1);
 				}
 			}
 		}
@@ -124,11 +128,14 @@ public class PlayerController : MonoBehaviour {
 					//right
 					if (grid.getTransformAtGrid (xGridPos + 1, zGridPos, out tempTrans)) {
 						// tempTrans exists
+						// even if it's not out of bounds, it could still return null
 						// is it a sheep?
-						Sheep sheep = tempTrans.GetComponent<Sheep>();
-						if (sheep != null) {
-							// move 1 on x-axis, 0 on z-axis
-							sheep.move (1, 0);
+						if (tempTrans != null) {
+							Sheep sheep = tempTrans.GetComponent<Sheep> ();
+							if (sheep != null) {
+								// move 1 on x-axis, 0 on z-axis
+								sheep.move (1, 0);
+							}
 						}
 					}
 					break;
@@ -139,10 +146,12 @@ public class PlayerController : MonoBehaviour {
 					if (grid.getTransformAtGrid (xGridPos - 1, zGridPos, out tempTrans)) {
 						// tempTrans exists
 						// is it a sheep?
-						Sheep sheep = tempTrans.GetComponent<Sheep>();
-						if (sheep != null) {
-							// move 1 on x-axis, 0 on z-axis
-							sheep.move (-1, 0);
+						if (tempTrans != null) {
+							Sheep sheep = tempTrans.GetComponent<Sheep> ();
+							if (sheep != null) {
+								// move 1 on x-axis, 0 on z-axis
+								sheep.move (-1, 0);
+							}
 						}
 					}
 					break;
@@ -153,10 +162,12 @@ public class PlayerController : MonoBehaviour {
 					if (grid.getTransformAtGrid (xGridPos, zGridPos + 1, out tempTrans)) {
 						// tempTrans exists
 						// is it a sheep?
-						Sheep sheep = tempTrans.GetComponent<Sheep>();
-						if (sheep != null) {
-							// move 1 on x-axis, 0 on z-axis
-							sheep.move (0, 1);
+						if (tempTrans != null) {
+							Sheep sheep = tempTrans.GetComponent<Sheep> ();
+							if (sheep != null) {
+								// move 1 on x-axis, 0 on z-axis
+								sheep.move (0, 1);
+							}
 						}
 					}
 					break;
@@ -167,10 +178,12 @@ public class PlayerController : MonoBehaviour {
 					if (grid.getTransformAtGrid (xGridPos, zGridPos - 1, out tempTrans)) {
 						// tempTrans exists
 						// is it a sheep?
-						Sheep sheep = tempTrans.GetComponent<Sheep>();
-						if (sheep != null) {
-							// move 1 on x-axis, 0 on z-axis
-							sheep.move (0, -1);
+						if (tempTrans != null) {
+							Sheep sheep = tempTrans.GetComponent<Sheep> ();
+							if (sheep != null) {
+								// move 1 on x-axis, 0 on z-axis
+								sheep.move (0, -1);
+							}
 						}
 					}
 					break;

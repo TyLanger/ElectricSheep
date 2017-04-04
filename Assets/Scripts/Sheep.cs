@@ -4,11 +4,11 @@ using UnityEngine;
 
 public class Sheep : MonoBehaviour {
 
-	int xStartGrid = 1;
-	int zStartGrid = 2;
+	public int xStartGrid = 1;
+	public int zStartGrid = 2;
 
-	int xGridPos;
-	int zGridPos;
+	public int xGridPos;
+	public int zGridPos;
 
 	public Grid grid;
 
@@ -41,7 +41,9 @@ public class Sheep : MonoBehaviour {
 		if (grid.gridToVec3 (xGridPos + xDelta, zGridPos + zDelta, out tempMovePos)) {
 			// success
 			movePos = tempMovePos;
-			grid.moveOnGrid (xGridPos, zGridPos, xDelta, zDelta);
+			if (!grid.moveOnGrid (xGridPos, zGridPos, xDelta, zDelta)) {
+				Debug.Log("Can't move on grid: "+xGridPos+", "+zGridPos+" + " + xDelta+", "+zDelta);
+			}
 			xGridPos += xDelta;
 			zGridPos += zDelta;
 		}
