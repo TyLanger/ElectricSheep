@@ -7,8 +7,8 @@ public class Grid : MonoBehaviour {
 
 	Transform[,] grid;
 
-	int xGridSize = 5;
-	int zGridSize = 6;
+	int xGridSize = 6;
+	int zGridSize = 7;
 	public float gridSpacing;
 
 	void Awake() {
