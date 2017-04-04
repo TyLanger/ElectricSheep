@@ -4,11 +4,11 @@ using UnityEngine;
 
 public class Grid : MonoBehaviour {
 
-	[SerializeField]
-	public Transform[,] grid;
+
+	Transform[,] grid;
 
 	int xGridSize = 5;
-	int zGridSize = 5;
+	int zGridSize = 6;
 	public float gridSpacing;
 
 	void Awake() {
@@ -93,6 +93,12 @@ public class Grid : MonoBehaviour {
 
 	public bool moveOnGrid(int xCurrent, int zCurrent, int xChange, int zChange)
 	{
+		// default is non-sheep
+		return moveOnGrid (xCurrent, zCurrent, xChange, zChange, false, null);
+	}
+
+	public bool moveOnGrid(int xCurrent, int zCurrent, int xChange, int zChange, bool isSheep, Sheep sheep)
+	{
 		if (outOfBounds (xCurrent, zCurrent)) {
 			// current is out of bounds
 			Debug.Log("Out of bounds: "+xCurrent+", "+zCurrent+" + "+xChange+", "+zChange);
@@ -102,6 +108,26 @@ public class Grid : MonoBehaviour {
 		{
 			// place moving to is out of bounds
 			Debug.Log("Moving to out of bounds: "+xCurrent+", "+zCurrent+" + "+xChange+", "+zChange);
+			return false;
+		}
+		if(grid [xCurrent + xChange, zCurrent + zChange] != null)
+		{
+			// something in the way
+			if (isSheep) {
+				
+				Transform tempTrans = grid [xCurrent + xChange, zCurrent + zChange];
+				Debug.Log (tempTrans);
+				if (tempTrans.GetComponent<Fence>() != null) {
+					if (tempTrans.GetComponent<Fence> ().broken) {
+						// sheep can jump over broken fence
+						// sheep moves one more up
+						grid [xCurrent + xChange, zCurrent + zChange+1] = grid [xCurrent, zCurrent];
+						grid [xCurrent, zCurrent] = null;
+						sheep.hopFence (xCurrent+xChange, zCurrent+zChange+1);
+						return true;
+					}
+				}
+			}
 			return false;
 		}
 		grid [xCurrent + xChange, zCurrent + zChange] = grid [xCurrent, zCurrent];

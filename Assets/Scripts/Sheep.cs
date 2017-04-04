@@ -39,13 +39,24 @@ public class Sheep : MonoBehaviour {
 	public void move(int xDelta, int zDelta)
 	{
 		if (grid.gridToVec3 (xGridPos + xDelta, zGridPos + zDelta, out tempMovePos)) {
-			// success
-			movePos = tempMovePos;
-			if (!grid.moveOnGrid (xGridPos, zGridPos, xDelta, zDelta)) {
+			// position is in bounds
+
+			if (!grid.moveOnGrid (xGridPos, zGridPos, xDelta, zDelta, true, this)) {
 				Debug.Log("Can't move on grid: "+xGridPos+", "+zGridPos+" + " + xDelta+", "+zDelta);
+				// something in the way
+				return;
 			}
+			movePos = tempMovePos;
 			xGridPos += xDelta;
 			zGridPos += zDelta;
+		}
+	}
+
+	public void hopFence(int xPos, int zPos)
+	{
+		// positon sheep will be after fence jump
+		if (grid.gridToVec3 (xPos, zPos, out tempMovePos)) {
+			movePos = tempMovePos;
 		}
 	}
 
