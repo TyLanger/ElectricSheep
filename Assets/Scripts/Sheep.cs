@@ -42,7 +42,7 @@ public class Sheep : MonoBehaviour {
 			// position is in bounds
 
 			if (!grid.moveOnGrid (xGridPos, zGridPos, xDelta, zDelta, true, this)) {
-				Debug.Log("Can't move on grid: "+xGridPos+", "+zGridPos+" + " + xDelta+", "+zDelta);
+				//Debug.Log("Can't move on grid: "+xGridPos+", "+zGridPos+" + " + xDelta+", "+zDelta);
 				// something in the way
 				return;
 			}
@@ -57,6 +57,7 @@ public class Sheep : MonoBehaviour {
 		// positon sheep will be after fence jump
 		if (grid.gridToVec3 (xPos, zPos, out tempMovePos)) {
 			movePos = tempMovePos;
+			//TODO play a jump animation to make it look like you're not just passing right through the fence
 		}
 	}
 
