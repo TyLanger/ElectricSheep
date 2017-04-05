@@ -12,7 +12,7 @@ public class TextController : MonoBehaviour {
 	public float letterSpacing;
 	public float heightScale;
 	CharacterInfo[] charInfo;
-	Dictionary<char, int> charWidthDic;
+	static Dictionary<char, int> charWidthDic;
 
 	public AnimationCurve xycurve;
 
@@ -29,6 +29,9 @@ public class TextController : MonoBehaviour {
 		charInfo = textMesh.font.characterInfo;
 		//Debug.Log ((70 - 'A'));
 
+		// TODO
+		// dictionary should probably be somewhere more central so it doesn't get created for every 3D text object
+		// something like a billboard that doesn't get destroyed on load
 		charWidthDic = new Dictionary<char, int>();
 
 
@@ -62,7 +65,7 @@ public class TextController : MonoBehaviour {
 			
 
 			var text = Instantiate (textMesh, transform.position + new Vector3(i * letterSpacing, xycurve.Evaluate((float)i/message.Length)*heightScale, 0), cameraTrans.rotation) as TextMesh;
-
+			text.transform.parent = transform;
 			/*
 			Vector2 v1 = new Vector2((float)i/message.Length, xycurve.Evaluate((float)i/message.Length));
 			Vector2 v2 = new Vector2((float)i/message.Length + 0.01f, xycurve.Evaluate((float)i/message.Length + 0.01f));

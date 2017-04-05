@@ -112,26 +112,37 @@ public class Grid : MonoBehaviour {
 		}
 		if(grid [xCurrent + xChange, zCurrent + zChange] != null)
 		{
-			// something in the way
-			if (isSheep) {
+			// check if the transform is grass
+			if (grid [xCurrent + xChange, zCurrent + zChange].GetComponent<Grass> () == null) {
+				// if it does NOT have a grass component, you can't move onto its space
+				// something in the way
+				if (isSheep) {
 				
-				Transform tempTrans = grid [xCurrent + xChange, zCurrent + zChange];
-				Debug.Log (tempTrans);
-				// is the thing ran into a fence?
-				if (tempTrans.GetComponent<Fence>() != null) {
-					if (tempTrans.GetComponent<Fence> ().broken) {
-						// sheep can jump over broken fence
-						// sheep moves one more up
-						grid [xCurrent + xChange, zCurrent + zChange+1] = grid [xCurrent, zCurrent];
-						grid [xCurrent, zCurrent] = null;
-						// assume fence is only above the sheep
-						sheep.hopFence (xCurrent+xChange, zCurrent+zChange+1);
-						return true;
+					Transform tempTrans = grid [xCurrent + xChange, zCurrent + zChange];
+					Debug.Log (tempTrans);
+					// is the thing ran into a fence?
+					if (tempTrans.GetComponent<Fence> () != null) {
+						if (tempTrans.GetComponent<Fence> ().broken) {
+							// sheep can jump over broken fence
+							// sheep moves one more up
+							grid [xCurrent + xChange, zCurrent + zChange + 1] = grid [xCurrent, zCurrent];
+							grid [xCurrent, zCurrent] = null;
+							// assume fence is only above the sheep
+							sheep.hopFence (xCurrent + xChange, zCurrent + zChange + 1);
+							return true;
+						}
 					}
 				}
+				Debug.Log (grid [xCurrent + xChange, zCurrent + zChange] + " in the way.");
+				return false;
 			}
-			Debug.Log (grid [xCurrent + xChange, zCurrent + zChange] + " in the way.");
-			return false;
+
+			// the transform was grass. Things can move onto grass
+			/*
+			grid [xCurrent + xChange, zCurrent + zChange] = grid[xCurrent, zCurrent];
+			grid [xCurrent, zCurrent] = null;
+			return true;
+			*/
 		}
 		grid [xCurrent + xChange, zCurrent + zChange] = grid [xCurrent, zCurrent];
 

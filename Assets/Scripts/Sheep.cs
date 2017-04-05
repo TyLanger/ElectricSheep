@@ -11,6 +11,7 @@ public class Sheep : MonoBehaviour {
 	public int zGridPos;
 
 	public Grid grid;
+	public ScoreController scoreController;
 
 	public float moveSpeed;
 	// position to move towards
@@ -31,7 +32,7 @@ public class Sheep : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-
+		
 
 		transform.position = Vector3.MoveTowards (transform.position, movePos, moveSpeed);
 	}
@@ -49,6 +50,7 @@ public class Sheep : MonoBehaviour {
 			movePos = tempMovePos;
 			xGridPos += xDelta;
 			zGridPos += zDelta;
+			checkForGrass ();
 		}
 	}
 
@@ -57,8 +59,54 @@ public class Sheep : MonoBehaviour {
 		// positon sheep will be after fence jump
 		if (grid.gridToVec3 (xPos, zPos, out tempMovePos)) {
 			movePos = tempMovePos;
+			scoreController.increaseScore (1);
 			//TODO play a jump animation to make it look like you're not just passing right through the fence
 		}
+	}
+
+	void checkForGrass()
+	{
+		Debug.Log ("Checking for grass");
+		Debug.Log ("Current pos: " + xGridPos + ", " + zGridPos);
+		Transform outTrans;
+		if (grid.getTransformAtGrid (xGridPos + 1, zGridPos, out outTrans)) {
+			if (outTrans != null) {
+				Debug.Log (outTrans);
+				if (outTrans.GetComponent<Grass> () != null) {
+					// grass to the right
+					Debug.Log("Found it right");
+					move (1, 0);
+				}
+			}
+		} if (grid.getTransformAtGrid (xGridPos - 1, zGridPos, out outTrans)) {
+			if (outTrans != null) {
+				Debug.Log (outTrans);
+				if (outTrans.GetComponent<Grass> () != null) {
+					// grass to the left
+					Debug.Log("Found it left");
+					move (-1, 0);
+				}
+			}
+		} if (grid.getTransformAtGrid (xGridPos, zGridPos + 1, out outTrans)) {
+			if (outTrans != null) {
+				Debug.Log (outTrans);
+				if (outTrans.GetComponent<Grass> () != null) {
+					// grass above
+					Debug.Log("Found it above");
+					move (0, 1);
+				}
+			}
+		} if (grid.getTransformAtGrid (xGridPos, zGridPos - 1, out outTrans)) {
+			if (outTrans != null) {
+				Debug.Log (outTrans);
+				if (outTrans.GetComponent<Grass> () != null) {
+					// grass below
+					Debug.Log("Found it below");
+					move (0, -1);
+				}
+			}
+		}
+
 	}
 
 }
