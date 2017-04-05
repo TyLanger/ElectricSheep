@@ -15,6 +15,13 @@ public class Grass : MonoBehaviour {
 
 	Vector3 movePos;
 
+	public float regrowTime = 5;
+	float timeEatenAt;
+	bool eaten = false;
+
+	float originalHeight = 1;
+	float eatenHeight = 0.2f;
+
 	// Use this for initialization
 	void Start () {
 		xGridPos = xStartGrid;
@@ -29,6 +36,25 @@ public class Grass : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-		
+		if (eaten) {
+			if (Time.time > timeEatenAt + regrowTime) {
+				regrowGrass ();
+
+			}
+		}
+	}
+
+	public void eatGrass()
+	{
+		transform.localScale = new Vector3(eatenHeight, eatenHeight, eatenHeight);
+		timeEatenAt = Time.time;
+		eaten = true;
+	}
+
+	void regrowGrass()
+	{
+		eaten = false;
+		transform.localScale = new Vector3 (1, originalHeight, 1);
+		grid.addToGrid (xGridPos, zGridPos, transform);
 	}
 }

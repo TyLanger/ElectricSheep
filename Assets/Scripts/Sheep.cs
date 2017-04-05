@@ -76,6 +76,7 @@ public class Sheep : MonoBehaviour {
 					// grass to the right
 					Debug.Log("Found it right");
 					move (1, 0);
+					outTrans.GetComponent<Grass> ().eatGrass ();
 				}
 			}
 		} if (grid.getTransformAtGrid (xGridPos - 1, zGridPos, out outTrans)) {
@@ -85,6 +86,7 @@ public class Sheep : MonoBehaviour {
 					// grass to the left
 					Debug.Log("Found it left");
 					move (-1, 0);
+					outTrans.GetComponent<Grass> ().eatGrass ();
 				}
 			}
 		} if (grid.getTransformAtGrid (xGridPos, zGridPos + 1, out outTrans)) {
@@ -94,6 +96,7 @@ public class Sheep : MonoBehaviour {
 					// grass above
 					Debug.Log("Found it above");
 					move (0, 1);
+					outTrans.GetComponent<Grass> ().eatGrass ();
 				}
 			}
 		} if (grid.getTransformAtGrid (xGridPos, zGridPos - 1, out outTrans)) {
@@ -103,6 +106,7 @@ public class Sheep : MonoBehaviour {
 					// grass below
 					Debug.Log("Found it below");
 					move (0, -1);
+					outTrans.GetComponent<Grass> ().eatGrass ();
 				}
 			}
 		}
