@@ -12,6 +12,10 @@ public class Grass : GridObject {
 	float originalHeight = 1;
 	float eatenHeight = 0.2f;
 
+	protected override void Start() {
+		base.Start();
+
+	}
 
 	
 	// Update is called once per frame

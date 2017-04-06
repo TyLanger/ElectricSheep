@@ -18,7 +18,7 @@ public class GridObject : MonoBehaviour {
 	protected Vector3 tempMovePos;
 
 	// Use this for initialization
-	void Start () {
+	protected virtual void Start () {
 		xGridPos = xStartGrid;
 		zGridPos = zStartGrid;
 

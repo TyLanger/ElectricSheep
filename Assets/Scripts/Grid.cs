@@ -2,6 +2,28 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+
+public struct GridSpace {
+
+	GridObject[] gridObjects;
+	int index;
+	int maxObjects;
+
+	public GridSpace(int _maxObjects)
+	{
+		maxObjects = _maxObjects;
+		gridObjects = new GridObject[maxObjects];
+		index = 0;
+		gridObjects [index] = null;
+	}
+
+	public void add(GridObject g)
+	{
+		gridObjects [index] = g;
+	}
+
+}
+
 public class Grid : MonoBehaviour {
 
 
