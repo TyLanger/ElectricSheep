@@ -2,33 +2,11 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Sheep : MonoBehaviour {
+public class Sheep : GridObject {
 
-	public int xStartGrid = 1;
-	public int zStartGrid = 2;
 
-	public int xGridPos;
-	public int zGridPos;
-
-	public Grid grid;
 	public ScoreController scoreController;
 
-	public float moveSpeed;
-	// position to move towards
-	Vector3 movePos;
-	Vector3 tempMovePos;
-
-	// Use this for initialization
-	void Start () {
-		xGridPos = xStartGrid;
-		zGridPos = zStartGrid;
-
-		if(grid.gridToVec3(xStartGrid, zStartGrid, out movePos))
-		{
-			transform.position = movePos;
-			grid.addToGrid (xGridPos, zGridPos, transform);
-		}
-	}
 	
 	// Update is called once per frame
 	void Update () {
@@ -37,7 +15,7 @@ public class Sheep : MonoBehaviour {
 		transform.position = Vector3.MoveTowards (transform.position, movePos, moveSpeed);
 	}
 
-	public void move(int xDelta, int zDelta)
+	public override void move(int xDelta, int zDelta)
 	{
 		if (grid.gridToVec3 (xGridPos + xDelta, zGridPos + zDelta, out tempMovePos)) {
 			// position is in bounds
@@ -52,6 +30,8 @@ public class Sheep : MonoBehaviour {
 			zGridPos += zDelta;
 			checkForGrass ();
 		}
+
+
 	}
 
 	public void hopFence(int xPos, int zPos)
@@ -66,45 +46,37 @@ public class Sheep : MonoBehaviour {
 
 	void checkForGrass()
 	{
-		Debug.Log ("Checking for grass");
-		Debug.Log ("Current pos: " + xGridPos + ", " + zGridPos);
+		// check one space to the right, left, above, and below for grass
+		// if you find it, move to that spot and eat the grass
 		Transform outTrans;
 		if (grid.getTransformAtGrid (xGridPos + 1, zGridPos, out outTrans)) {
 			if (outTrans != null) {
-				Debug.Log (outTrans);
 				if (outTrans.GetComponent<Grass> () != null) {
 					// grass to the right
-					Debug.Log("Found it right");
 					move (1, 0);
 					outTrans.GetComponent<Grass> ().eatGrass ();
 				}
 			}
 		} if (grid.getTransformAtGrid (xGridPos - 1, zGridPos, out outTrans)) {
 			if (outTrans != null) {
-				Debug.Log (outTrans);
 				if (outTrans.GetComponent<Grass> () != null) {
 					// grass to the left
-					Debug.Log("Found it left");
 					move (-1, 0);
 					outTrans.GetComponent<Grass> ().eatGrass ();
 				}
 			}
 		} if (grid.getTransformAtGrid (xGridPos, zGridPos + 1, out outTrans)) {
 			if (outTrans != null) {
-				Debug.Log (outTrans);
 				if (outTrans.GetComponent<Grass> () != null) {
 					// grass above
-					Debug.Log("Found it above");
 					move (0, 1);
 					outTrans.GetComponent<Grass> ().eatGrass ();
 				}
 			}
 		} if (grid.getTransformAtGrid (xGridPos, zGridPos - 1, out outTrans)) {
 			if (outTrans != null) {
-				Debug.Log (outTrans);
 				if (outTrans.GetComponent<Grass> () != null) {
 					// grass below
-					Debug.Log("Found it below");
 					move (0, -1);
 					outTrans.GetComponent<Grass> ().eatGrass ();
 				}

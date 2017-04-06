@@ -14,6 +14,7 @@ public class TextController : MonoBehaviour {
 	CharacterInfo[] charInfo;
 	static Dictionary<char, int> charWidthDic;
 
+	public bool curved = false;
 	public AnimationCurve xycurve;
 
 	float minShakeStrength = 0.2f;
@@ -60,13 +61,13 @@ public class TextController : MonoBehaviour {
 		if(charWidthDic.TryGetValue('y', out width))
 			Debug.Log ("y: " + width);
 		*/
-
-		for (int i = 0; i < message.Length-1; i++) {
+		if (curved) {
+			for (int i = 0; i < message.Length - 1; i++) {
 			
 
-			var text = Instantiate (textMesh, transform.position + new Vector3(i * letterSpacing, xycurve.Evaluate((float)i/message.Length)*heightScale, 0), cameraTrans.rotation) as TextMesh;
-			text.transform.parent = transform;
-			/*
+				var text = Instantiate (textMesh, transform.position + new Vector3 (i * letterSpacing, xycurve.Evaluate ((float)i / message.Length) * heightScale, 0), cameraTrans.rotation) as TextMesh;
+				text.transform.parent = transform;
+				/*
 			Vector2 v1 = new Vector2((float)i/message.Length, xycurve.Evaluate((float)i/message.Length));
 			Vector2 v2 = new Vector2((float)i/message.Length + 0.01f, xycurve.Evaluate((float)i/message.Length + 0.01f));
 			var rot = Vector2.Angle (Vector2.right, (v2 - v1).normalized);
@@ -78,19 +79,24 @@ public class TextController : MonoBehaviour {
 			*/
 
 
-			//text.transform.Rotate (new Vector3 (0,0,rot * ((v2.y - v1.y)/Mathf.Abs(v2.y - v1.y))));
-			//var charInfo = text.font.characterInfo;
+				//text.transform.Rotate (new Vector3 (0,0,rot * ((v2.y - v1.y)/Mathf.Abs(v2.y - v1.y))));
+				//var charInfo = text.font.characterInfo;
 
-			text.text = message.Substring (i, 1);
-			//Debug.Log (text.text + ": " + (text.text.ToCharArray()[0]+0));
-			//charInfo [(char)text.text];
+				text.text = message.Substring (i, 1);
+				//Debug.Log (text.text + ": " + (text.text.ToCharArray()[0]+0));
+				//charInfo [(char)text.text];
 
-			/* This makes the letters shake kinda.
+				/* This makes the letters shake kinda.
 			 * Shelving this for now
 			Shake textShake = text.GetComponent<Shake> ();
 			textShake.shakeStrength = Mathf.Lerp (minShakeStrength, maxShakeStrength, (float)i/message.Length);
 			//textShake.shakeTime = Mathf.Lerp (maxShakeTime, minShakeTime, (float)i/message.Length);
 			*/
+			}
+		} else {
+			var text = Instantiate (textMesh, transform.position, transform.rotation) as TextMesh;
+			text.transform.parent = transform;
+			text.text = message;
 		}
 	}
 	
