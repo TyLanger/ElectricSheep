@@ -25,21 +25,17 @@ public class GridObject : MonoBehaviour {
 		if(grid.gridToVec3(xStartGrid, zStartGrid, out movePos))
 		{
 			transform.position = movePos;
-			grid.addToGrid (xGridPos, zGridPos, transform);
+			grid.addToGrid (xGridPos, zGridPos, this);
 		}
 	}
-	
-	// Update is called once per frame
-	void Update () {
-		
-	}
+
 
 	public virtual void move(int xDelta, int zDelta)
 	{
 		if (grid.gridToVec3 (xGridPos + xDelta, zGridPos + zDelta, out tempMovePos)) {
 			// position is in bounds
 
-			if (!grid.moveOnGrid (xGridPos, zGridPos, xDelta, zDelta)) {
+			if (!grid.moveOnGrid (xGridPos, zGridPos, xDelta, zDelta, this)) {
 				//Debug.Log("Can't move on grid: "+xGridPos+", "+zGridPos+" + " + xDelta+", "+zDelta);
 				// something in the way
 				return;

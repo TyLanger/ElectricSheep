@@ -4,38 +4,22 @@ using UnityEngine;
 
 public enum Facing{up, down, left, right};
 
-public class PlayerController : MonoBehaviour {
+public class PlayerController : GridObject {
 
-	int xStartGrid = 0;
-	int zStartGrid = 0;
-	Vector3 startPos;
+
 
 	Facing facing;
 
-	int xGridPos;
-	int zGridPos;
-
-	public float moveSpeed;
-	public Grid grid;
-
-	// this is the position the player is currently moving towards
-	Vector3 movePos;
-	// used as temporary storage before the vector is verified
-	// If not out of bound, this will get set to movePos and the player can move.
-	Vector3 tempMovePos;
-
+	// used for finding sheep
+	// can't use new keyword for them
+	public Sheep sheep;
+	public GridObject foundSheep;
 
 	// Use this for initialization
-	void Start () {
+	protected override void Start () {
+		base.Start ();
 		facing = Facing.right;
 
-		xGridPos = xStartGrid;
-		zGridPos = zStartGrid;
-		if(grid.gridToVec3(xStartGrid, zStartGrid, out startPos))
-		{
-			transform.position = startPos;
-			grid.addToGrid (xGridPos, zGridPos, transform);
-		}
 	}
 	
 	// Update is called once per frame
@@ -53,7 +37,7 @@ public class PlayerController : MonoBehaviour {
 			if (facing != Facing.right) {
 				facing = Facing.right;
 			}
-			if (grid.canMoveToGrid (xGridPos + 1, zGridPos)) {
+			if (grid.canMoveToGrid (xGridPos + 1, zGridPos, false)) {
 				// if nothing occupying that space
 				// move right
 				// if this isn't out of bounds, it will set movePos to the vec3 position of that grid space
@@ -62,7 +46,7 @@ public class PlayerController : MonoBehaviour {
 					xGridPos += 1;
 					movePos = tempMovePos;
 					// -1 in first place because already updated gridPos
-					grid.moveOnGrid (xGridPos - 1, zGridPos, 1, 0);
+					grid.moveOnGrid (xGridPos - 1, zGridPos, 1, 0, this);
 				}
 			}
 		}
@@ -72,14 +56,14 @@ public class PlayerController : MonoBehaviour {
 			if (facing != Facing.left) {
 				facing = Facing.left;
 			}
-			if (grid.canMoveToGrid (xGridPos - 1, zGridPos)) {
+			if (grid.canMoveToGrid (xGridPos - 1, zGridPos, false)) {
 				// if nothing occupying that space
 				// move left
 				if (grid.gridToVec3 (xGridPos - 1, zGridPos, out tempMovePos)) {
 					xGridPos -= 1;
 					movePos = tempMovePos;
 					// -1 in first place because already updated gridPos
-					grid.moveOnGrid (xGridPos + 1, zGridPos, -1, 0);
+					grid.moveOnGrid (xGridPos + 1, zGridPos, -1, 0, this);
 				}
 			}
 		}
@@ -89,14 +73,14 @@ public class PlayerController : MonoBehaviour {
 			if (facing != Facing.up) {
 				facing = Facing.up;
 			}
-			if (grid.canMoveToGrid (xGridPos, zGridPos + 1)) {
+			if (grid.canMoveToGrid (xGridPos, zGridPos + 1, false)) {
 				// if nothing occupying that space
 				// move up
 				if (grid.gridToVec3 (xGridPos, zGridPos + 1, out tempMovePos)) {
 					zGridPos += 1;
 					movePos = tempMovePos;
 					// -1 in first place because already updated gridPos
-					grid.moveOnGrid (xGridPos, zGridPos - 1, 0, 1);
+					grid.moveOnGrid (xGridPos, zGridPos - 1, 0, 1, this);
 				}
 			}
 		}
@@ -106,26 +90,33 @@ public class PlayerController : MonoBehaviour {
 			if (facing != Facing.down) {
 				facing = Facing.down;
 			} 
-			if (grid.canMoveToGrid (xGridPos, zGridPos - 1)) {
+			if (grid.canMoveToGrid (xGridPos, zGridPos - 1, false)) {
 				// if nothing occupying that space
 				// move left
 				if (grid.gridToVec3 (xGridPos, zGridPos - 1, out tempMovePos)) {
 					zGridPos -= 1;
 					movePos = tempMovePos;
 					// -1 in first place because already updated gridPos
-					grid.moveOnGrid (xGridPos, zGridPos + 1, 0, -1);
+					grid.moveOnGrid (xGridPos, zGridPos + 1, 0, -1, this);
 				}
 			}
 		}
 
 		if (Input.GetKeyDown ("space")) {
 			// swing your crook
-			Transform tempTrans;
+			//Transform tempTrans;
+			//Sheep sheep;
+			//GridObject foundSheep;
 			switch (facing) 
 			{
 				case Facing.right:
 				{
 					//right
+					if (grid.findAtGrid (xGridPos + 1, zGridPos, sheep, out foundSheep)) {
+						// found a sheep at that grid spot
+						foundSheep.GetComponent<Sheep>().move (1, 0);
+					}
+					/*
 					if (grid.getTransformAtGrid (xGridPos + 1, zGridPos, out tempTrans)) {
 						// tempTrans exists
 						// even if it's not out of bounds, it could still return null
@@ -137,12 +128,17 @@ public class PlayerController : MonoBehaviour {
 								sheep.move (1, 0);
 							}
 						}
-					}
+					}*/
 					break;
 				}
 				case Facing.left:
 				{
 					// left
+					if (grid.findAtGrid (xGridPos + 1, zGridPos, sheep, out foundSheep)) {
+						// found a sheep at that grid spot
+						foundSheep.GetComponent<Sheep>().move (-1, 0);
+					}
+					/*
 					if (grid.getTransformAtGrid (xGridPos - 1, zGridPos, out tempTrans)) {
 						// tempTrans exists
 						// is it a sheep?
@@ -153,12 +149,17 @@ public class PlayerController : MonoBehaviour {
 								sheep.move (-1, 0);
 							}
 						}
-					}
+					}*/
 					break;
 				}
 				case Facing.up:
 				{
 					// up
+					if (grid.findAtGrid (xGridPos + 1, zGridPos, sheep, out foundSheep)) {
+						// found a sheep at that grid spot
+						foundSheep.GetComponent<Sheep>().move (0, 1);
+					}
+					/*
 					if (grid.getTransformAtGrid (xGridPos, zGridPos + 1, out tempTrans)) {
 						// tempTrans exists
 						// is it a sheep?
@@ -169,12 +170,17 @@ public class PlayerController : MonoBehaviour {
 								sheep.move (0, 1);
 							}
 						}
-					}
+					}*/
 					break;
 				}
 				case Facing.down:
 				{
 					// down
+					if (grid.findAtGrid (xGridPos + 1, zGridPos, sheep, out foundSheep)) {
+						// found a sheep at that grid spot
+						foundSheep.GetComponent<Sheep>().move (0, -1);
+					}
+					/*
 					if (grid.getTransformAtGrid (xGridPos, zGridPos - 1, out tempTrans)) {
 						// tempTrans exists
 						// is it a sheep?
@@ -185,7 +191,7 @@ public class PlayerController : MonoBehaviour {
 								sheep.move (0, -1);
 							}
 						}
-					}
+					}*/
 					break;
 				}
 			}

@@ -2,11 +2,11 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-
+[System.Serializable]
 public struct GridSpace {
 
-	GridObject[] gridObjects;
-	int index;
+	public GridObject[] gridObjects;
+	public int index;
 	int maxObjects;
 
 	public GridSpace(int _maxObjects)
@@ -20,6 +20,35 @@ public struct GridSpace {
 	public void add(GridObject g)
 	{
 		gridObjects [index] = g;
+		index++;
+	}
+
+	public bool remove(GridObject g)
+	{
+		for (int i = 0; i < index; i++) {
+			if (gridObjects [i] == g) {
+				// found it, remove it
+				// move the thing in the last position to overwrite this
+				gridObjects[i] = gridObjects[index];
+				index--;
+				return true;
+			}
+		}
+		return false;
+	}
+
+	public bool find(GridObject g, out int _index)
+	{
+		for (int i = 0; i < index; i++) {
+			if (gridObjects [i].GetComponent<GridObject> () != null) {
+				if (gridObjects [i].GetComponent<GridObject> () == g) {
+					_index = i;
+					return true;
+				}
+			}
+		}
+		_index = -1;
+		return false;
 	}
 
 }
@@ -27,14 +56,25 @@ public struct GridSpace {
 public class Grid : MonoBehaviour {
 
 
-	Transform[,] grid;
+	GridSpace[,] grid;
+
+	// can't use the new keyword for Grass
+	public Grass grass;
+
+	[SerializeField]
+	public GridSpace gSpace;
 
 	int xGridSize = 6;
 	int zGridSize = 7;
 	public float gridSpacing;
 
 	void Awake() {
-		grid = new Transform[xGridSize, zGridSize];
+		grid = new GridSpace[xGridSize, zGridSize];
+		for (int x = 0; x < xGridSize; x++) {
+			for (int z = 0; z < zGridSize; z++) {
+				grid [x, z] = new GridSpace (3);
+			}
+		}
 	}
 
 	void OnDrawGizmosSelected()
@@ -83,43 +123,77 @@ public class Grid : MonoBehaviour {
 		return true;
 	}
 
-	public bool getTransformAtGrid(int xGrid, int zGrid, out Transform outTrans)
+	public bool getTransformAtGrid(int xGrid, int zGrid, out Transform[] outTransforms)
 	{
-		if ((xGrid >= xGridSize || xGrid < 0) || (zGrid >= zGridSize || zGrid < 0)) {
-			outTrans = null;
-			return false;
-		}
-		// even if it's not out of bounds, it could still return null
-		outTrans = grid [xGrid, zGrid];
-		return true;
-	}
-
-	public bool canMoveToGrid(int xGrid, int zGrid)
-	{
-		/* getTransformAtGrid checks if out of bound already
-		if ((xGrid >= xGridSize || xGrid < 0) || (zGrid >= zGridSize || zGrid < 0)) {
-			// check out of bounds
-			return false;
-		}
-		*/
-
-		Transform trans;
-		if (getTransformAtGrid (xGrid, zGrid, out trans)) {
-			// if it's empty, then you can move there
-			if (trans == null) {
-				return true;
+		GridObject[] GOs;
+		if (getGridObjectsAtGrid (xGrid, zGrid, out GOs)) {
+			outTransforms = new Transform[GOs.Length];
+			for (int i = 0; i < GOs.Length; i++) {
+				outTransforms [i] = GOs [i].transform;
 			}
+			return true;
 		}
+		outTransforms = null;
 		return false;
 	}
 
-	public bool moveOnGrid(int xCurrent, int zCurrent, int xChange, int zChange)
+	public bool getGridObjectsAtGrid(int xGrid, int zGrid, out GridObject[] outGO)
 	{
-		// default is non-sheep
-		return moveOnGrid (xCurrent, zCurrent, xChange, zChange, false, null);
+		if ((xGrid >= xGridSize || xGrid < 0) || (zGrid >= zGridSize || zGrid < 0)) {
+			outGO = null;
+			return false;
+		}
+		// even if it's not out of bounds, it could still return null
+		if(grid [xGrid, zGrid].index > 0)
+		{
+			// something there
+			GridObject[] objects = new GridObject[grid [xGrid, zGrid].index];
+			for (int i = 0; i < grid[xGrid, zGrid].index; i++) {
+				objects [i] = grid [xGrid, zGrid].gridObjects[i];
+			}
+			outGO = objects;
+			return true;
+
+		}
+		// no objects there
+		outGO = null;
+		return false;
 	}
 
-	public bool moveOnGrid(int xCurrent, int zCurrent, int xChange, int zChange, bool isSheep, Sheep sheep)
+	public bool canMoveToGrid(int xGrid, int zGrid, bool isSheep)
+	{
+		if (outOfBounds (xGrid, zGrid)) {
+			return false;
+		}
+		if (grid [xGrid, zGrid].index > 0) {
+			// something is there
+			GridObject[] gos;
+			if (getGridObjectsAtGrid (xGrid, zGrid, out gos)) {
+				for (int i = 0; i < gos.Length; i++) {
+					if (gos [i].GetComponent<Grass> () != null) {
+						// just grass, can walk there
+						return true;
+					} else if (isSheep && (gos [i].GetComponent<Fence> () != null)) {
+						if (gos [i].GetComponent<Fence> ().broken) {
+							return true;
+						}
+					}
+				}
+			}
+
+			return false;
+		}
+		// nothing is there
+		return true;
+	}
+
+	public bool moveOnGrid(int xCurrent, int zCurrent, int xChange, int zChange, GridObject gridObject)
+	{
+		// default is non-sheep
+		return moveOnGrid (xCurrent, zCurrent, xChange, zChange, false, gridObject);
+	}
+
+	public bool moveOnGrid(int xCurrent, int zCurrent, int xChange, int zChange, bool isSheep, GridObject gridObject)
 	{
 		if (outOfBounds (xCurrent, zCurrent)) {
 			// current is out of bounds
@@ -132,6 +206,32 @@ public class Grid : MonoBehaviour {
 			Debug.Log("Moving to out of bounds: "+xCurrent+", "+zCurrent+" + "+xChange+", "+zChange);
 			return false;
 		}
+
+		if (canMoveToGrid (xCurrent+xChange, zCurrent+zChange, isSheep)) {
+			// at most, only grass in the way
+
+			if (isSheep) {
+				// check for broken fence
+				int index;
+				if (grid [xCurrent + xChange, zCurrent + zChange].find (grass, out index)) {
+					// move one extra up to jump over the fence
+					grid [xCurrent + xChange, zCurrent + zChange + 1].add(gridObject);
+					grid [xCurrent, zCurrent].remove(gridObject);
+					return true;
+				}
+			}
+
+			// add this to next spot
+			grid [xCurrent + xChange, zCurrent + zChange].add(gridObject);
+			// remove from previous spot
+			grid [xCurrent, zCurrent].remove(gridObject);
+
+			return true;
+		}
+		Debug.Log ("Last return");
+		return false;
+		/*
+		 * Old jumping over fence
 		if(grid [xCurrent + xChange, zCurrent + zChange] != null)
 		{
 			// check if the transform is grass
@@ -159,26 +259,37 @@ public class Grid : MonoBehaviour {
 				return false;
 			}
 
+
 			// the transform was grass. Things can move onto grass
 			/*
 			grid [xCurrent + xChange, zCurrent + zChange] = grid[xCurrent, zCurrent];
 			grid [xCurrent, zCurrent] = null;
 			return true;
-			*/
-		}
-		grid [xCurrent + xChange, zCurrent + zChange] = grid [xCurrent, zCurrent];
 
-		grid [xCurrent, zCurrent] = null;
-		return true;
+		}
+	*/
+
 	}
 
-	public bool addToGrid(int xPos, int zPos, Transform addTrans)
+	public bool addToGrid(int xPos, int zPos, GridObject gridObject)
 	{
 		if (outOfBounds(xPos, zPos)) {
 			return false;
 		}
-		grid [xPos, zPos] = addTrans;
+		grid [xPos, zPos].add(gridObject);
 		return true;
+	}
+
+	public bool findAtGrid(int xPos, int zPos, GridObject toFind, out GridObject found)
+	{
+		int index;
+		if (grid [xPos, zPos].find (toFind, out index)) {
+			// found it
+			found = grid[xPos, zPos].gridObjects[index];
+			return true;
+		}
+		found = null;
+		return false;
 	}
 
 	/// <summary>

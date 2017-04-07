@@ -7,6 +7,8 @@ public class Sheep : GridObject {
 
 	public ScoreController scoreController;
 
+	public Grass grass;
+	public GridObject foundGrass;
 	
 	// Update is called once per frame
 	void Update () {
@@ -17,11 +19,12 @@ public class Sheep : GridObject {
 
 	public override void move(int xDelta, int zDelta)
 	{
+		
 		if (grid.gridToVec3 (xGridPos + xDelta, zGridPos + zDelta, out tempMovePos)) {
 			// position is in bounds
 
 			if (!grid.moveOnGrid (xGridPos, zGridPos, xDelta, zDelta, true, this)) {
-				//Debug.Log("Can't move on grid: "+xGridPos+", "+zGridPos+" + " + xDelta+", "+zDelta);
+				Debug.Log("Can't move on grid: "+xGridPos+", "+zGridPos+" + " + xDelta+", "+zDelta);
 				// something in the way
 				return;
 			}
@@ -48,6 +51,30 @@ public class Sheep : GridObject {
 	{
 		// check one space to the right, left, above, and below for grass
 		// if you find it, move to that spot and eat the grass
+
+
+		if (grid.findAtGrid (xGridPos + 1, zGridPos, grass, out foundGrass)) {
+			// found grass right
+			move(1,0);
+			foundGrass.GetComponent<Grass>().eatGrass();
+		}
+		if (grid.findAtGrid (xGridPos - 1, zGridPos, grass, out foundGrass)) {
+			// found grass left
+			move(-1, 0);
+			foundGrass.GetComponent<Grass>().eatGrass();
+		}
+		if (grid.findAtGrid (xGridPos, zGridPos + 1, grass, out foundGrass)) {
+			// found grass up
+			move(0, 1);
+			foundGrass.GetComponent<Grass>().eatGrass();
+		}
+		if (grid.findAtGrid (xGridPos, zGridPos - 1, grass, out foundGrass)) {
+			// found grass down
+			move(0, -1);
+			foundGrass.GetComponent<Grass>().eatGrass();
+		}
+
+		/*
 		Transform outTrans;
 		if (grid.getTransformAtGrid (xGridPos + 1, zGridPos, out outTrans)) {
 			if (outTrans != null) {
@@ -81,7 +108,7 @@ public class Sheep : GridObject {
 					outTrans.GetComponent<Grass> ().eatGrass ();
 				}
 			}
-		}
+		}*/
 
 	}
 
