@@ -51,7 +51,7 @@ public class Sheep : GridObject {
 	{
 		// check one space to the right, left, above, and below for grass
 		// if you find it, move to that spot and eat the grass
-
+		Debug.Log("Checking");
 
 		if (grid.findAtGrid (xGridPos + 1, zGridPos, grass, foundGrass)) {
 			// found grass right
