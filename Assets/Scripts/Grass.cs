@@ -7,14 +7,14 @@ public class Grass : GridObject {
 
 	public float regrowTime = 5;
 	float timeEatenAt;
-	bool eaten = false;
+	public bool eaten = false;
 
 	float originalHeight = 1;
 	float eatenHeight = 0.2f;
 
 	protected override void Start() {
 		base.Start();
-
+		gridType = GridType.Grass;
 	}
 
 	

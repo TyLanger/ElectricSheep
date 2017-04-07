@@ -34,18 +34,20 @@ public struct GridSpace {
 				return true;
 			}
 		}
+		Debug.Log ("Remove failed");
 		return false;
 	}
 
-	public bool find(GridObject g, out int _index)
+	public bool find(GridType gridType, out int _index)
 	{
 		for (int i = 0; i < index; i++) {
 			if (gridObjects [i] != null) {
 				if (gridObjects [i].GetComponent<GridObject> () != null) {
-					if (gridObjects [i].GetComponent<GridObject> () == g) {
+					if (gridObjects [i].GetComponent<GridObject> ().gridType == gridType) {
+						//Debug.Log ("Same: " +gridObjects [i].GetComponent<GridObject> ().gridType + " g: " + gridType);
 						_index = i;
 						return true;
-					}
+					} 
 				}
 			}
 		}
@@ -172,8 +174,10 @@ public class Grid : MonoBehaviour {
 			GridObject[] gos;
 			if (getGridObjectsAtGrid (xGrid, zGrid, out gos)) {
 				for (int i = 0; i < gos.Length; i++) {
-					if (gos [i].GetComponent<Grass> () != null) {
+					if (gos [i].GetComponent<Grass> () != null && grid[xGrid, zGrid].index == 1) {
+						// index is only 1 so
 						// just grass, can walk there
+						Debug.Log("Moving into grass spot");
 						return true;
 					} else if (isSheep && (gos [i].GetComponent<Fence> () != null)) {
 						if (gos [i].GetComponent<Fence> ().broken) {
@@ -197,6 +201,7 @@ public class Grid : MonoBehaviour {
 
 	public bool moveOnGrid(int xCurrent, int zCurrent, int xChange, int zChange, bool isSheep, GridObject gridObject)
 	{
+		//Debug.Log("Move on grid: "+xCurrent+", "+zCurrent+" + "+xChange+", "+zChange);
 		if (outOfBounds (xCurrent, zCurrent)) {
 			// current is out of bounds
 			Debug.Log("Out of bounds: "+xCurrent+", "+zCurrent+" + "+xChange+", "+zChange);
@@ -212,20 +217,24 @@ public class Grid : MonoBehaviour {
 		if (canMoveToGrid (xCurrent+xChange, zCurrent+zChange, isSheep)) {
 			// at most, only grass in the way
 
+			/* Do this in sheep class
 			if (isSheep) {
 				// check for broken fence
 				int index;
-				if (grid [xCurrent + xChange, zCurrent + zChange].find (grass, out index)) {
+				if (grid [xCurrent + xChange, zCurrent + zChange].find (GridType.Fence, out index)) {
 					// move one extra up to jump over the fence
+					Debug.Log("Found fence");
 					grid [xCurrent + xChange, zCurrent + zChange + 1].add(gridObject);
 					grid [xCurrent, zCurrent].remove(gridObject);
 					return true;
 				}
-			}
+			}*/
 
+			//Debug.Log("add: "+xCurrent+", "+zCurrent+" + "+xChange+", "+zChange);
 			// add this to next spot
 			grid [xCurrent + xChange, zCurrent + zChange].add(gridObject);
 			// remove from previous spot
+			//Debug.Log("Remove: "+xCurrent+", "+zCurrent);
 			grid [xCurrent, zCurrent].remove(gridObject);
 
 			return true;
@@ -282,18 +291,23 @@ public class Grid : MonoBehaviour {
 		return true;
 	}
 
-	public bool findAtGrid(int xPos, int zPos, GridObject toFind, GridObject found)
+	public bool findAtGrid(int xPos, int zPos, GridType toFind, ref GridObject found)
 	{
 		int index;
+		if (outOfBounds (xPos, zPos)) {
+			return false;
+		}
 		if (grid [xPos, zPos].find (toFind, out index)) {
 			// found it
 			found = grid[xPos, zPos].gridObjects[index];
 			Debug.Log(index + " found: "+grid[xPos, zPos].gridObjects[index]);
 			return true;
 		}
-		found = null;
+		//found = null;
 		return false;
 	}
+
+
 
 	/// <summary>
 	/// Returns true if out of bounds

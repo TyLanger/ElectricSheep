@@ -19,7 +19,7 @@ public class PlayerController : GridObject {
 	protected override void Start () {
 		base.Start ();
 		facing = Facing.right;
-
+		gridType = GridType.Player;
 	}
 	
 	// Update is called once per frame
@@ -112,7 +112,7 @@ public class PlayerController : GridObject {
 				case Facing.right:
 				{
 					//right
-					if (grid.findAtGrid (xGridPos + 1, zGridPos, sheep,  foundSheep)) {
+					if (grid.findAtGrid (xGridPos + 1, zGridPos, GridType.Sheep, ref foundSheep)) {
 						// found a sheep at that grid spot
 						foundSheep.GetComponent<Sheep>().move (1, 0);
 					}
@@ -134,7 +134,7 @@ public class PlayerController : GridObject {
 				case Facing.left:
 				{
 					// left
-					if (grid.findAtGrid (xGridPos - 1, zGridPos, sheep, foundSheep)) {
+					if (grid.findAtGrid (xGridPos - 1, zGridPos, GridType.Sheep, ref foundSheep)) {
 						// found a sheep at that grid spot
 						foundSheep.GetComponent<Sheep>().move (-1, 0);
 					}
@@ -155,8 +155,9 @@ public class PlayerController : GridObject {
 				case Facing.up:
 				{
 					// up
-					if (grid.findAtGrid (xGridPos, zGridPos + 1, sheep,  foundSheep)) {
+					if (grid.findAtGrid (xGridPos, zGridPos + 1, GridType.Sheep, ref foundSheep)) {
 						// found a sheep at that grid spot
+						Debug.Log(foundSheep);
 						foundSheep.GetComponent<Sheep>().move (0, 1);
 					}
 					/*
@@ -176,7 +177,7 @@ public class PlayerController : GridObject {
 				case Facing.down:
 				{
 					// down
-					if (grid.findAtGrid (xGridPos, zGridPos - 1, sheep,  foundSheep)) {
+					if (grid.findAtGrid (xGridPos, zGridPos - 1, GridType.Sheep, ref foundSheep)) {
 						// found a sheep at that grid spot
 						foundSheep.GetComponent<Sheep>().move (0, -1);
 					}
