@@ -53,24 +53,25 @@ public class Sheep : GridObject {
 		// if you find it, move to that spot and eat the grass
 
 
-		if (grid.findAtGrid (xGridPos + 1, zGridPos, grass, out foundGrass)) {
+		if (grid.findAtGrid (xGridPos + 1, zGridPos, grass, foundGrass)) {
 			// found grass right
 			move(1,0);
 			foundGrass.GetComponent<Grass>().eatGrass();
 		}
-		if (grid.findAtGrid (xGridPos - 1, zGridPos, grass, out foundGrass)) {
+		if (grid.findAtGrid (xGridPos - 1, zGridPos, grass, foundGrass)) {
 			// found grass left
 			move(-1, 0);
 			foundGrass.GetComponent<Grass>().eatGrass();
 		}
-		if (grid.findAtGrid (xGridPos, zGridPos + 1, grass, out foundGrass)) {
+		if (grid.findAtGrid (xGridPos, zGridPos + 1, grass, foundGrass)) {
 			// found grass up
 			move(0, 1);
 			foundGrass.GetComponent<Grass>().eatGrass();
 		}
-		if (grid.findAtGrid (xGridPos, zGridPos - 1, grass, out foundGrass)) {
+		if (grid.findAtGrid (xGridPos, zGridPos - 1, grass, foundGrass)) {
 			// found grass down
 			move(0, -1);
+			//Debug.Log (foundGrass);
 			foundGrass.GetComponent<Grass>().eatGrass();
 		}
 

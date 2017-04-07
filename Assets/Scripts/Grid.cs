@@ -40,10 +40,12 @@ public struct GridSpace {
 	public bool find(GridObject g, out int _index)
 	{
 		for (int i = 0; i < index; i++) {
-			if (gridObjects [i].GetComponent<GridObject> () != null) {
-				if (gridObjects [i].GetComponent<GridObject> () == g) {
-					_index = i;
-					return true;
+			if (gridObjects [i] != null) {
+				if (gridObjects [i].GetComponent<GridObject> () != null) {
+					if (gridObjects [i].GetComponent<GridObject> () == g) {
+						_index = i;
+						return true;
+					}
 				}
 			}
 		}
@@ -280,12 +282,13 @@ public class Grid : MonoBehaviour {
 		return true;
 	}
 
-	public bool findAtGrid(int xPos, int zPos, GridObject toFind, out GridObject found)
+	public bool findAtGrid(int xPos, int zPos, GridObject toFind, GridObject found)
 	{
 		int index;
 		if (grid [xPos, zPos].find (toFind, out index)) {
 			// found it
 			found = grid[xPos, zPos].gridObjects[index];
+			Debug.Log(index + " found: "+grid[xPos, zPos].gridObjects[index]);
 			return true;
 		}
 		found = null;
@@ -307,7 +310,8 @@ public class Grid : MonoBehaviour {
 	{
 		for (int x = 0; x < xGridSize; x++) {
 			for (int z = 0; z < zGridSize; z++) {
-				Debug.Log (x + ", " + z + ": " + grid [x, z]);
+				
+				Debug.Log (x + ", " + z + ": " + grid [x, z].gridObjects[0] + " " + grid [x, z].gridObjects[1] + " " + grid [x, z].gridObjects[2]);
 			}
 		}
 	}

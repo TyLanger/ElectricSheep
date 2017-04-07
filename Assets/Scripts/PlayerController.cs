@@ -112,7 +112,7 @@ public class PlayerController : GridObject {
 				case Facing.right:
 				{
 					//right
-					if (grid.findAtGrid (xGridPos + 1, zGridPos, sheep, out foundSheep)) {
+					if (grid.findAtGrid (xGridPos + 1, zGridPos, sheep,  foundSheep)) {
 						// found a sheep at that grid spot
 						foundSheep.GetComponent<Sheep>().move (1, 0);
 					}
@@ -134,7 +134,7 @@ public class PlayerController : GridObject {
 				case Facing.left:
 				{
 					// left
-					if (grid.findAtGrid (xGridPos + 1, zGridPos, sheep, out foundSheep)) {
+					if (grid.findAtGrid (xGridPos + 1, zGridPos, sheep,  foundSheep)) {
 						// found a sheep at that grid spot
 						foundSheep.GetComponent<Sheep>().move (-1, 0);
 					}
@@ -155,7 +155,7 @@ public class PlayerController : GridObject {
 				case Facing.up:
 				{
 					// up
-					if (grid.findAtGrid (xGridPos + 1, zGridPos, sheep, out foundSheep)) {
+					if (grid.findAtGrid (xGridPos + 1, zGridPos, sheep,  foundSheep)) {
 						// found a sheep at that grid spot
 						foundSheep.GetComponent<Sheep>().move (0, 1);
 					}
@@ -176,7 +176,7 @@ public class PlayerController : GridObject {
 				case Facing.down:
 				{
 					// down
-					if (grid.findAtGrid (xGridPos + 1, zGridPos, sheep, out foundSheep)) {
+					if (grid.findAtGrid (xGridPos + 1, zGridPos, sheep,  foundSheep)) {
 						// found a sheep at that grid spot
 						foundSheep.GetComponent<Sheep>().move (0, -1);
 					}

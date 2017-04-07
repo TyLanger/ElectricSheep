@@ -41,6 +41,6 @@ public class Grass : GridObject {
 	{
 		eaten = false;
 		transform.localScale = new Vector3 (1, originalHeight, 1);
-		grid.addToGrid (xGridPos, zGridPos, this);
+		//grid.addToGrid (xGridPos, zGridPos, this);
 	}
 }
