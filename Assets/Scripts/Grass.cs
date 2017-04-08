@@ -9,7 +9,7 @@ public class Grass : GridObject {
 	float timeEatenAt;
 	public bool eaten = false;
 
-	float originalHeight = 1;
+	float originalHeight = 2;
 	float eatenHeight = 0.2f;
 
 	protected override void Start() {
@@ -22,7 +22,7 @@ public class Grass : GridObject {
 	void Update () {
 		if (eaten) {
 			// make the grass get bigger as is grows back
-			transform.localScale = new Vector3 ((Time.time - timeEatenAt) / regrowTime, (Time.time - timeEatenAt) / regrowTime, (Time.time - timeEatenAt) / regrowTime);
+			transform.localScale = new Vector3 ((Time.time - timeEatenAt) / regrowTime * originalHeight, (Time.time - timeEatenAt) / regrowTime * originalHeight, (Time.time - timeEatenAt) / regrowTime * originalHeight);
 			if (Time.time > timeEatenAt + regrowTime) {
 				regrowGrass ();
 
@@ -40,7 +40,7 @@ public class Grass : GridObject {
 	void regrowGrass()
 	{
 		eaten = false;
-		transform.localScale = new Vector3 (1, originalHeight, 1);
+		transform.localScale = new Vector3 (originalHeight, originalHeight, 1);
 		//grid.addToGrid (xGridPos, zGridPos, this);
 	}
 }
