@@ -300,7 +300,7 @@ public class Grid : MonoBehaviour {
 		if (grid [xPos, zPos].find (toFind, out index)) {
 			// found it
 			found = grid[xPos, zPos].gridObjects[index];
-			Debug.Log(index + " found: "+grid[xPos, zPos].gridObjects[index]);
+			//Debug.Log(index + " found: "+grid[xPos, zPos].gridObjects[index]);
 			return true;
 		}
 		//found = null;
