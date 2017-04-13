@@ -28,18 +28,28 @@ public class TextController : MonoBehaviour {
 
 		// sorts the message into alphabetical order
 		charInfo = textMesh.font.characterInfo;
+		// this is somehow always filled with the letters I want....
+		// Even if I create a new 3D text and put that in textMesh
+		// It is filled with all the letters I have used so far
+
+
 		//Debug.Log ((70 - 'A'));
+
 
 		// TODO
 		// dictionary should probably be somewhere more central so it doesn't get created for every 3D text object
 		// something like a billboard that doesn't get destroyed on load
 		charWidthDic = new Dictionary<char, int>();
-
+		charWidthDic.Clear ();
 
 		for (int t = 0; t < charInfo.Length; t++) {
 			//Debug.Log(((char)charInfo[t].index) + " " + charInfo[t].advance + " " + charInfo[t].index);
 			// fill up the dictionary
-			charWidthDic.Add (((char)charInfo [t].index), charInfo [t].advance);
+			if (!charWidthDic.ContainsKey ((char)charInfo [t].index)) {
+				// only add if key doesnt exist
+				//Debug.Log((char)charInfo [t].index);
+				charWidthDic.Add (((char)charInfo [t].index), charInfo [t].advance);
+			}
 		}
 
 		/* Dictionary testing
@@ -62,11 +72,25 @@ public class TextController : MonoBehaviour {
 			Debug.Log ("y: " + width);
 		*/
 		if (curved) {
+
+			Vector3 lastLetterPos = Vector3.zero;
+
 			for (int i = 0; i < message.Length - 1; i++) {
 			
+				//char[] letter = new char[1];
+				char[] letter = message.Substring (i, 1).ToCharArray();
+				// needs to be char array to use the method
+				int spacing;
+				// use 0, because you know there is only 1 char in the array
+				// from substring(i, 1). the 1 means 1 char
+				if (charWidthDic.TryGetValue (letter[0], out spacing)) {
+					var text = Instantiate (textMesh, transform.position + new Vector3 (lastLetterPos.x + spacing*letterSpacing, xycurve.Evaluate ((float)i / message.Length) * heightScale, 0), cameraTrans.rotation) as TextMesh;
+					text.transform.parent = transform;
+					text.text = letter[0].ToString();
+					Debug.Log (text.text + ": " + spacing);
+					lastLetterPos = text.transform.position;
+				}
 
-				var text = Instantiate (textMesh, transform.position + new Vector3 (i * letterSpacing, xycurve.Evaluate ((float)i / message.Length) * heightScale, 0), cameraTrans.rotation) as TextMesh;
-				text.transform.parent = transform;
 				/*
 			Vector2 v1 = new Vector2((float)i/message.Length, xycurve.Evaluate((float)i/message.Length));
 			Vector2 v2 = new Vector2((float)i/message.Length + 0.01f, xycurve.Evaluate((float)i/message.Length + 0.01f));
@@ -82,7 +106,7 @@ public class TextController : MonoBehaviour {
 				//text.transform.Rotate (new Vector3 (0,0,rot * ((v2.y - v1.y)/Mathf.Abs(v2.y - v1.y))));
 				//var charInfo = text.font.characterInfo;
 
-				text.text = message.Substring (i, 1);
+
 				//Debug.Log (text.text + ": " + (text.text.ToCharArray()[0]+0));
 				//charInfo [(char)text.text];
 

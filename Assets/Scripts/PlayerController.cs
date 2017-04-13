@@ -157,7 +157,7 @@ public class PlayerController : GridObject {
 					// up
 					if (grid.findAtGrid (xGridPos, zGridPos + 1, GridType.Sheep, ref foundSheep)) {
 						// found a sheep at that grid spot
-						Debug.Log(foundSheep);
+						//Debug.Log(foundSheep);
 						foundSheep.GetComponent<Sheep>().move (0, 1);
 					}
 					/*

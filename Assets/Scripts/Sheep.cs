@@ -40,7 +40,7 @@ public class Sheep : GridObject {
 			xGridPos += xDelta;
 			zGridPos += zDelta;
 			if (checkForFence ()) {
-				Debug.Log ("Found broken fence");
+				//Debug.Log ("Found broken fence");
 				hopFence (xGridPos, zGridPos+1);
 			}
 			checkForGrass ();

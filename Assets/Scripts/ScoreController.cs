@@ -28,6 +28,7 @@ public class ScoreController : MonoBehaviour {
 
 	public void advanceLevel()
 	{
+		Debug.Log ("You beat level " + currentLevel);
 		currentLevel++;
 	}
 
