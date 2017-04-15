@@ -9,7 +9,7 @@ public class ScoreController : MonoBehaviour {
 
 	public int[] scoreToAdvanceLevel;
 	int currentLevel = 0;
-	int numberOfLevels = 5;
+	//int numberOfLevels = 5;
 
 	void Awake()
 	{
@@ -30,6 +30,10 @@ public class ScoreController : MonoBehaviour {
 	{
 		Debug.Log ("You beat level " + currentLevel);
 		currentLevel++;
+		if (currentLevel == scoreToAdvanceLevel.Length) {
+			// overflow
+			currentLevel--;
+		}
 	}
 
 }

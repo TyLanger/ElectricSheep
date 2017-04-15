@@ -81,7 +81,7 @@ public class Grid : MonoBehaviour {
 		}
 	}
 
-	void OnDrawGizmosSelected()
+	void OnDrawGizmos()
 	{
 		Vector3 pos;
 		for (int x = 0; x < xGridSize; x++) {
