@@ -12,6 +12,9 @@ public class TextController : MonoBehaviour {
 		public float typeSpeed;
 		public bool continuous;
 		public Color colour;
+		// for if I want the first letter of a word to be a different colour
+		// this way, there is no space between the single letter and rest of the word
+		public bool spaceAtEnd;
 	}
 
 	public textComponent[] messages;
@@ -27,14 +30,18 @@ public class TextController : MonoBehaviour {
 
 	// max width words can go before they get wrapped to a new line
 	public float maxWidth;
+	bool tooBig = false;
+	string[] overFlowWords;
 	public float lineSpacing = 1;
 	string[] words;
 	int currentWordIndex = 0;
 	TextMesh currentTextMesh;
+	TextMesh lastTextMesh;
 	int currentLetterIndex = 1;
 	int currentLineIndex = 1;
 	Vector3 lastWordPos;
 	public float wordSpacing = 1;
+	float lastXshift = 0;
 
 	//Transform movingWord;
 
@@ -125,43 +132,86 @@ public class TextController : MonoBehaviour {
 			if (Time.time > timeSinceLastLetter) {
 				timeSinceLastLetter = Time.time + typeSpeed;
 
+				/**
+				 * textComponent mode
+				 * 
+				 * 
+				 */
 				if (useTextComponent) {
 					// use the special properties of the textComponents
 					// i.e. different colour for different words
 					// each text component is its own object
-
 					if (currentTextMesh == null) {
+						
 						Vector3 wordPos;
 						if (textComponentIndex == 0) {
 							wordPos = Vector3.zero;
 						} else {
-							wordPos = lastWordPos + new Vector3 ((wordSpacing + letterSpacing * wordWidth (words [Mathf.Max (0, currentWordIndex - 1)])), 0, 0);
+							wordPos = lastWordPos + new Vector3 ((letterSpacing * wordWidth (lastTextMesh.text)), 0, 0);
 						}
 
 						if (wordPos.x > maxWidth) {
 							// wrap words
 							// relative to parent so 0
+							//Debug.Log(wordPos.x);
 							wordPos = new Vector3 (0, -lineSpacing * currentLineIndex, 0);
 							currentLineIndex++;
 						}
+
+
+						Debug.Log (wordPos.x + " " + wordWidth (messages [textComponentIndex].message) * letterSpacing + " "+messages [textComponentIndex].message);
+						if (((wordPos.x + wordWidth (messages [textComponentIndex].message) * letterSpacing) > maxWidth) || ((lastXshift + wordWidth (messages [textComponentIndex].message) * letterSpacing) > maxWidth)) {
+							//Debug.Log ("Width: " + wordWidth (messages [textComponentIndex].message) * letterSpacing + " " + messages [textComponentIndex].message);
+							tooBig = true;
+						
+							//Debug.Log ("wordWidth exceeeded maxWidth");
+							// the message is too big to be on one line.
+							// split it up and create more textComponents
+							if (overFlowWords == null) {
+								//Debug.Log ("First time init");
+								overFlowWords = messages [textComponentIndex].message.Split (new char[]{ ' ' }, 30);
+							}
+
+							messages [textComponentIndex].message = wordsTilWrap (overFlowWords, wordPos.x);
+							Debug.Log (messages [textComponentIndex].message + ".");
+								
+						}
+						if ((wordWidth (messages [textComponentIndex].message) * letterSpacing) < maxWidth && (wordPos.x + wordWidth (messages [textComponentIndex].message) * letterSpacing) > maxWidth) {
+							// only long enough with the wordPos.x
+							Debug.Log("Only big enough with the x shift");
+							lastXshift = wordPos.x;
+						}
+
 						typeSpeed = messages [textComponentIndex].typeSpeed;
+
 						instantiateWord (wordPos, messages [textComponentIndex].message);
 						currentTextMesh.color = messages [textComponentIndex].colour;
+						//currentTextMesh.color = messages [textComponentIndex].colour;
 						lastWordPos = wordPos;
-					}					
+					}			
 					// draw the next letter
 					// letterIndex < numLetters
-					if (currentLetterIndex <= messages [textComponentIndex].message.Length) {
+					if (currentLetterIndex <= messages [textComponentIndex].message.Length && (currentTextMesh!= null)) {
+						//Debug.Log (currentLetterIndex + ": " + messages [textComponentIndex].message.Length);
 						currentTextMesh.text = messages [textComponentIndex].message.Substring (0, currentLetterIndex);
 						currentLetterIndex++;
 					} else {
 						// new section 
 						// move on to next textComponent in the array
+						if (currentTextMesh != null) {
+							lastTextMesh = currentTextMesh;
+							currentTextMesh = null;
+						}
 
+						if (tooBig) {
+							// if it was too big to fit into one textMesh
+							// dont move on to the next textComponent yet
+							Debug.Log("Too big: " + lastTextMesh.text);
+							tooBig = false;
 
-						//currentTextMesh.color = messages [textComponentIndex].colour;
-						currentTextMesh = null;
-						textComponentIndex++;
+						} else {
+							textComponentIndex++;
+						}
 						currentLetterIndex = 1;
 						if (textComponentIndex == messages.Length) {
 								
@@ -171,7 +221,11 @@ public class TextController : MonoBehaviour {
 
 
 				}
-
+				/**
+				 * Letter by letter
+				 * 
+				 * 
+				 */
 				// Create each letter as its own object
 				// each letter appears one at a time after a delay of typeSpeed seconds
 				else if (letterIndex < message.Length && !wordMode) {
@@ -184,7 +238,12 @@ public class TextController : MonoBehaviour {
 						instantiateLetter (letterPos, letter [0]);
 						lastLetterPos = letterPos;
 					}
-				
+
+				/**
+				 * word by word
+				 * 
+				 * 
+				 */
 				} else if (wordMode) {
 					// wordMode means each word is a different object instead of each letter being a different object
 
@@ -252,6 +311,103 @@ public class TextController : MonoBehaviour {
 				}
 			}
 		}
+	}
+		
+	/// <summary>
+	/// What do I even name this?
+	/// It takes words and figures out how many will fit in a line before it should wrap
+	/// It then puts those words back into the message for the current textComponent
+	/// Extra words get put into overflow
+	/// </summary>
+	/// <param name="words">Words.</param>
+	string wordsTilWrap(string[] words, float currentXoffset)
+	{
+		// figure out how many of the words to put into each textComponent
+		float sumWidth = 0;
+
+		string tempMessage = "";
+
+		for (int i = 0; i < words.Length; i++) {
+
+			if ((currentXoffset + sumWidth) >= maxWidth) {
+				// don't add this word to the current textComponent
+				sumWidth = 0;
+
+				//messages[textComponentIndex].message = tempMessage;
+				// add the remaining words to the overflow words
+				overFlowWords = new string[words.Length - i];
+				for (int j = 0; j < (words.Length-i); j++) {
+					overFlowWords [j] = words [i + j];
+				}
+
+				return tempMessage; //.Remove(tempMessage.Length-1);
+			} else {
+				tempMessage += words [i] + " ";
+			}
+			// that is a weird edge case
+			// this function gets called if the size of the message is greater than the line width
+			// but sometime it gets to the end of this function
+			// which should mean that it ISN'T bigger than maxWidth
+			// but I didn't account for spaces before
+			// so, if the message is too big because of some spaces, but not too big without the spaces,
+			// it messes up.
+			// fixed by adding a space with every word
+			sumWidth += letterSpacing*wordWidth ((words [i] + " "));
+		}
+		// if it makes it here, that means it needed the last word to have enough width to be too big.
+		overFlowWords = null;
+
+		tooBig = false;
+		if (messages [textComponentIndex].spaceAtEnd) {
+			return tempMessage; //.Remove(tempMessage.Length-1);
+		} else {
+			return tempMessage.Remove(tempMessage.Length-1);
+		}
+	}
+
+	/*
+	void splitTextComponent ()
+	{
+		string[] tempWords = messages [textComponentIndex].message.Split(new char[]{ ' ' }, 30);
+
+		// figure out how many of the words to put into each textComponent
+		int sumWidth = 0;
+		// make a new textComponent that is the same as the current one
+		// being split right now
+		textComponent tempText;
+		tempText = messages [textComponentIndex];
+		for (int i = 0; i < tempWords.Length; i++) {
+			sumWidth += wordWidth (tempWords [i]);
+			if (sumWidth >= maxWidth) {
+				// don't add this word to the current textComponent
+				sumWidth = 0;
+				// do this word again as the start of a new one
+				i--;
+				// add the textComponent that is now as long as it can be to all the messages
+				// them size of the array is made in the inspector to not have any extra room.....
+				// might be hard/unnescessary to make a new array to fit it....
+				// could just make a text component with the first few words,
+				// then make a new text component with the remaining words at the same textComponentIndex
+				// so I don't have to add extra space to the array
+				messages[textComponentIndex] = tempText;
+				tempText.message = "";
+			} else {
+				tempText.message += tempWords [i] + " ";
+			}
+		}
+	}*/
+
+	int wordsWidth(string[] words)
+	{
+		int sum = 0;
+		int width = 0;
+		// space deliminated
+		for (int i = 0; i < words.Length-1; i++) {
+			sum += wordWidth (words [i] + " ");
+		}
+		// dont add the space for the last word
+		sum += wordWidth (words[words.Length - 1]);
+		return sum;
 	}
 
 	int wordWidth(string word)
