@@ -32,6 +32,15 @@ public class GridObject : MonoBehaviour {
 		}
 	}
 
+	public void moveToPos(int xPos, int zPos)
+	{
+		if (grid.gridToVec3 (xPos, zPos, out movePos)) {
+			transform.position = movePos;
+			grid.moveOnGrid (xGridPos, zGridPos, xPos - xGridPos, zPos - zGridPos, this);
+			xGridPos = xPos;
+			zGridPos = zPos;
+		}
+	}
 
 	public virtual void move(int xDelta, int zDelta)
 	{

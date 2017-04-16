@@ -7,6 +7,7 @@ public class Grass : GridObject {
 
 	public float regrowTime = 5;
 	float timeEatenAt;
+	public AnimationCurve regrowCurve;
 	public bool eaten = false;
 
 	float originalHeight = 2;
@@ -22,7 +23,7 @@ public class Grass : GridObject {
 	void Update () {
 		if (eaten) {
 			// make the grass get bigger as is grows back
-			transform.localScale = new Vector3 ((Time.time - timeEatenAt) / regrowTime * originalHeight, (Time.time - timeEatenAt) / regrowTime * originalHeight, (Time.time - timeEatenAt) / regrowTime * originalHeight);
+			transform.localScale = new Vector3 (regrowCurve.Evaluate((Time.time - timeEatenAt) / regrowTime) * originalHeight, regrowCurve.Evaluate((Time.time - timeEatenAt) / regrowTime) * originalHeight, (Time.time - timeEatenAt) / regrowTime * originalHeight);
 			if (Time.time > timeEatenAt + regrowTime) {
 				regrowGrass ();
 

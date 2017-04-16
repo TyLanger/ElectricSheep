@@ -177,7 +177,7 @@ public class Grid : MonoBehaviour {
 					if (gos [i].GetComponent<Grass> () != null && grid[xGrid, zGrid].index == 1) {
 						// index is only 1 so
 						// just grass, can walk there
-						Debug.Log("Moving into grass spot");
+						//Debug.Log("Moving into grass spot");
 						return true;
 					} else if (isSheep && (gos [i].GetComponent<Fence> () != null)) {
 						if (gos [i].GetComponent<Fence> ().broken) {
