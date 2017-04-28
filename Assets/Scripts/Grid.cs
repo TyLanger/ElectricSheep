@@ -30,9 +30,14 @@ public struct GridSpace {
 				// found it, remove it
 				// move the thing in the last position to overwrite this
 				if (index < gridObjects.Length) {
+					// move the last place so that all the objects are in the first indecies
 					gridObjects [i] = gridObjects [index];
+					// set the last object to null for garbage collection
 					gridObjects [index] = null;
 				} else {
+					// if indec == Length,
+					// the item is found in the last place
+					// just need to set to null for garbage collection
 					gridObjects [i] = null;
 				}
 				index--;
