@@ -32,7 +32,6 @@ public class ScoreController : MonoBehaviour {
 
 	public void advanceLevel()
 	{
-		Debug.Log ("You beat level " + currentLevel);
 		director.completedLevel (currentLevel);
 		currentLevel++;
 		if (currentLevel == scoreToAdvanceLevel.Length) {

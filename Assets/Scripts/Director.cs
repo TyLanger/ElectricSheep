@@ -45,11 +45,13 @@ public class Director : MonoBehaviour {
 			count.gameObject.SetActive (true);
 			break;
 
-		case 5:
+		case 6:
 			player.gameObject.SetActive (true);
 			break;
 
-
+		case 14:
+			returnPlayerControl ();
+			break;
 
 
 		}
@@ -59,7 +61,6 @@ public class Director : MonoBehaviour {
 	{
 		switch (index) {
 		case 0:
-			Debug.Log ("Beat level 1");
 			player.canMove = false;
 			for (int i = 0; i < sheep.Length; i++) {
 				sheep [i].gameObject.SetActive (false);
@@ -68,7 +69,7 @@ public class Director : MonoBehaviour {
 				sheep [i].moveToPos (i + 1, i + 2);
 			}
 			Invoke ("activateAllSheep", 1);
-			Invoke ("activatePlayer", 1);
+			Invoke ("returnPlayerControl", 1);
 			break;
 		case 1:
 

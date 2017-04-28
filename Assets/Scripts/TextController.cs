@@ -18,6 +18,7 @@ public class TextController : MonoBehaviour {
 		// before it splits it into words
 		public bool spaceAtEnd;
 		public float pauseTimeAfter;
+		public bool clearBeforeThis;
 	}
 
 	public textComponent[] messages;
@@ -63,6 +64,8 @@ public class TextController : MonoBehaviour {
 	int letterIndex;
 	public bool useTextComponent = false;
 	int textComponentIndex = 0;
+	public float clearDelay = 1;
+	bool reset = false;
 
 	/*
 	float minShakeStrength = 0.2f;
@@ -146,12 +149,22 @@ public class TextController : MonoBehaviour {
 					// i.e. different colour for different words
 					// each text component is its own object
 					if (currentTextMesh == null) {
-						
+						if(messages[textComponentIndex].clearBeforeThis)
+						{
+							var textMeshes = gameObject.GetComponentsInChildren<TextMesh> ();
+							for (int t = 0; t < textMeshes.Length; t++) {
+								Destroy (textMeshes [t].gameObject);
+
+								reset = true;
+							}
+						}
+
 						Vector3 wordPos;
-						if (textComponentIndex == 0) {
+						if (textComponentIndex == 0 || reset) {
+							reset = false;
 							wordPos = Vector3.zero;
 						} else {
-							wordPos = lastWordPos + new Vector3 ((letterSpacing * wordWidth (lastTextMesh.text)), 0, 0);
+							wordPos = lastWordPos + new Vector3 ((letterSpacing * wordWidth (lastTextMesh.text + (messages[textComponentIndex-1].spaceAtEnd?" ":""))), 0, 0);
 						}
 
 						if (wordPos.x > maxWidth) {
@@ -164,23 +177,33 @@ public class TextController : MonoBehaviour {
 
 						// is the current message too big to fit on this line?
 						// split it into smaller messages
-						if (((wordPos.x + wordWidth (messages [textComponentIndex].message) * letterSpacing) > maxWidth) || ((lastXshift + wordWidth (messages [textComponentIndex].message) * letterSpacing) > maxWidth)) {
-							tooBig = true;
+						if (textComponentIndex < messages.Length) {
+							if (((wordPos.x + wordWidth (messages [textComponentIndex].message) * letterSpacing) > maxWidth) || ((lastXshift + wordWidth (messages [textComponentIndex].message) * letterSpacing) > maxWidth)) {
+								tooBig = true;
 						
-							// the message is too big to be on one line.
-							// split it up and create more textComponents
-							if (overFlowWords == null) {
-								overFlowWords = messages [textComponentIndex].message.Split (new char[]{ ' ' }, 30);
-							}
+								// the message is too big to be on one line.
+								// split it up and create more textComponents
+								if (overFlowWords == null) {
+									overFlowWords = messages [textComponentIndex].message.Split (new char[]{ ' ' }, 30);
+								}
 
-							messages [textComponentIndex].message = wordsTilWrap (overFlowWords, wordPos.x);
+								messages [textComponentIndex].message = wordsTilWrap (overFlowWords, wordPos.x);
 
 								
-						}
-						if ((wordWidth (messages [textComponentIndex].message) * letterSpacing) < maxWidth && (wordPos.x + wordWidth (messages [textComponentIndex].message) * letterSpacing) > maxWidth) {
-							// only long enough with the wordPos.x
-							// start of this message finishes off the last line.
-							lastXshift = wordPos.x;
+							}
+							if ((wordWidth (messages [textComponentIndex].message) * letterSpacing) < maxWidth && (wordPos.x + wordWidth (messages [textComponentIndex].message) * letterSpacing) > maxWidth) {
+								// only long enough with the wordPos.x
+								// start of this message finishes off the last line.
+
+								// append a space so the words don't run together
+								// but only if the previous word wanted a space after
+								if (textComponentIndex > 0) {
+									if (messages [textComponentIndex - 1].spaceAtEnd) {
+										messages [textComponentIndex].message = " " + messages [textComponentIndex].message;
+									}
+								}
+								lastXshift = wordPos.x;
+							}
 						}
 
 						typeSpeed = messages [textComponentIndex].typeSpeed;
@@ -215,13 +238,19 @@ public class TextController : MonoBehaviour {
 							// tell the director it is done so it can do something if it wants
 							director.textComponentDone (textComponentIndex);
 							textComponentIndex++;
+							if (textComponentIndex == messages.Length) {
+
+								typeOverTime = false;
+							}
+							else if(messages[textComponentIndex].clearBeforeThis)
+							{
+								currentLineIndex = 1;
+								timeSinceLastLetter += clearDelay;
+							}
 
 						}
 						currentLetterIndex = 1;
-						if (textComponentIndex == messages.Length) {
-								
-							typeOverTime = false;
-						}
+
 					}
 
 
@@ -376,7 +405,6 @@ public class TextController : MonoBehaviour {
 	int wordsWidth(string[] words)
 	{
 		int sum = 0;
-		int width = 0;
 		// space deliminated
 		for (int i = 0; i < words.Length-1; i++) {
 			sum += wordWidth (words [i] + " ");

@@ -29,7 +29,7 @@ public struct GridSpace {
 			if (gridObjects [i] == g) {
 				// found it, remove it
 				// move the thing in the last position to overwrite this
-				gridObjects[i] = gridObjects[index];
+				gridObjects[i] = gridObjects[gridObjects.Length-1];
 				index--;
 				return true;
 			}
