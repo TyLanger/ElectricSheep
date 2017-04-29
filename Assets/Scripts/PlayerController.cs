@@ -33,6 +33,7 @@ public class PlayerController : GridObject {
 		if (canMove) {
 			// not a huge fan of hard-coding the buttons like this, but this way you only move one space per button press
 			// with the hor and vert axis, you move multiple at a time and it's hard to control how many
+			// also works well with the in-game messages prompting for specific keys
 			if (Input.GetKeyDown ("d")) {
 				// right
 				if (facing != Facing.right) {

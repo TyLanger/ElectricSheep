@@ -10,6 +10,8 @@ public class Director : MonoBehaviour {
 
 	public Sheep[] sheep;
 	public Fence[] fence;
+	public Grass grass;
+	public GameObject bed;
 	public TextMesh count;
 	public PlayerController player;
 
@@ -30,26 +32,29 @@ public class Director : MonoBehaviour {
 
 			break;
 		case 1:
-			activateAllSheep ();
+			bed.SetActive (true);
 			break;
 		case 2:
+			activateAllSheep ();
+			break;
+		case 3:
 
 			//player.gameObject.SetActive (true);
 			break;
 
-		case 3:
+		case 4:
 			activateAllFence ();
 			break;
 
-		case 4:
+		case 5:
 			count.gameObject.SetActive (true);
 			break;
 
-		case 6:
+		case 7:
 			player.gameObject.SetActive (true);
 			break;
 
-		case 14:
+		case 15:
 			returnPlayerControl ();
 			break;
 
@@ -72,7 +77,7 @@ public class Director : MonoBehaviour {
 			Invoke ("returnPlayerControl", 1);
 			break;
 		case 1:
-
+			grass.gameObject.SetActive (true);
 
 			break;
 
