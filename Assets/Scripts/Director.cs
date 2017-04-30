@@ -69,6 +69,7 @@ public class Director : MonoBehaviour {
 			player.canMove = false;
 			for (int i = 0; i < sheep.Length; i++) {
 				sheep [i].gameObject.SetActive (false);
+
 			}
 			for (int i = 0; i < sheep.Length; i++) {
 				sheep [i].moveToPos (i + 1, i + 2);
@@ -92,7 +93,7 @@ public class Director : MonoBehaviour {
 	{
 		for (int i = 0; i < sheep.Length; i++) {
 			sheep [i].gameObject.SetActive( true);
-
+			sheep [i].GetComponent<Actor> ().appear ();
 		}
 	}
 
@@ -100,7 +101,7 @@ public class Director : MonoBehaviour {
 	{
 		for (int i = 0; i < fence.Length; i++) {
 			fence [i].gameObject.SetActive( true);
-
+			fence [i].GetComponent<Actor> ().appear ();
 		}
 	}
 }
