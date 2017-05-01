@@ -165,6 +165,7 @@ public class TextController : MonoBehaviour {
 							wordPos = Vector3.zero;
 						} else {
 							wordPos = lastWordPos + new Vector3 ((letterSpacing * wordWidth (lastTextMesh.text + (messages[textComponentIndex-1].spaceAtEnd?" ":""))), 0, 0);
+
 						}
 
 						if (wordPos.x > maxWidth) {
@@ -175,10 +176,12 @@ public class TextController : MonoBehaviour {
 							currentLineIndex++;
 						}
 
+
 						// is the current message too big to fit on this line?
 						// split it into smaller messages
 						if (textComponentIndex < messages.Length) {
 							if (((wordPos.x + wordWidth (messages [textComponentIndex].message) * letterSpacing) > maxWidth) || ((lastXshift + wordWidth (messages [textComponentIndex].message) * letterSpacing) > maxWidth)) {
+								
 								tooBig = true;
 						
 								// the message is too big to be on one line.
@@ -203,6 +206,8 @@ public class TextController : MonoBehaviour {
 									}
 								}
 								lastXshift = wordPos.x;
+							} else {
+								lastXshift = 0;
 							}
 						}
 
@@ -373,7 +378,6 @@ public class TextController : MonoBehaviour {
 				for (int j = 0; j < (words.Length-i); j++) {
 					overFlowWords [j] = words [i + j];
 				}
-
 				return tempMessage; //.Remove(tempMessage.Length-1);
 			} else {
 				tempMessage += words [i] + " ";
