@@ -72,7 +72,7 @@ public class Director : MonoBehaviour {
 
 			}
 			for (int i = 0; i < sheep.Length; i++) {
-				sheep [i].moveToPos (i + 1, i + 2);
+				sheep [i].moveToPos (i + 3, i + 2);
 			}
 			Invoke ("activateAllSheep", 1);
 			Invoke ("returnPlayerControl", 1);

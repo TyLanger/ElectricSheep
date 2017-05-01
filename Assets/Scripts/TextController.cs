@@ -53,6 +53,7 @@ public class TextController : MonoBehaviour {
 	public bool curved = false;
 	public AnimationCurve xycurve;
 
+	Vector3 wordPos;
 	Vector3 lastLetterPos;
 	int spacing;
 	char[] letter;
@@ -76,11 +77,12 @@ public class TextController : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
+		
 		letterIndex = 0;
 		var keys = xycurve.keys;
 		lastLetterPos = Vector3.zero;
 		lastWordPos = Vector3.zero;
-
+		wordPos = Vector3.zero;
 		words = message.Split (new char[]{ ' ' }, 30); 
 
 
@@ -159,7 +161,8 @@ public class TextController : MonoBehaviour {
 							}
 						}
 
-						Vector3 wordPos;
+
+
 						if (textComponentIndex == 0 || reset) {
 							reset = false;
 							wordPos = Vector3.zero;
@@ -175,7 +178,7 @@ public class TextController : MonoBehaviour {
 							wordPos = new Vector3 (0, -lineSpacing * currentLineIndex, 0);
 							currentLineIndex++;
 						}
-
+						lastWordPos = wordPos;
 
 						// is the current message too big to fit on this line?
 						// split it into smaller messages
@@ -200,6 +203,7 @@ public class TextController : MonoBehaviour {
 
 								// append a space so the words don't run together
 								// but only if the previous word wanted a space after
+
 								if (textComponentIndex > 0) {
 									if (messages [textComponentIndex - 1].spaceAtEnd) {
 										messages [textComponentIndex].message = " " + messages [textComponentIndex].message;
@@ -215,8 +219,7 @@ public class TextController : MonoBehaviour {
 
 						instantiateWord (wordPos, messages [textComponentIndex].message);
 						currentTextMesh.color = messages [textComponentIndex].colour;
-						//currentTextMesh.color = messages [textComponentIndex].colour;
-						lastWordPos = wordPos;
+
 					}			
 					// draw the next letter
 					// letterIndex < numLetters

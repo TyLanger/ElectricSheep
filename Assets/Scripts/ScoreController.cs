@@ -21,7 +21,7 @@ public class ScoreController : MonoBehaviour {
 	public void increaseScore(int points)
 	{
 		score += points;
-		GetComponentInChildren<TextMesh> ().text = score.ToString();
+		GetComponentInChildren<TextMesh> ().text = "Sheep counted: "+score.ToString();
 		if (score >= scoreToAdvanceLevel [currentLevel]) {
 			// reset score
 			score = 0;
