@@ -10,7 +10,7 @@ public class TextController : MonoBehaviour {
 	public struct textComponent {
 		public string message;
 		public float typeSpeed;
-		public bool continuous;
+		//public bool continuous;
 		public Color colour;
 		// for if I want the first letter of a word to be a different colour
 		// this way, there is no space between the single letter and rest of the word
@@ -19,6 +19,8 @@ public class TextController : MonoBehaviour {
 		public bool spaceAtEnd;
 		public float pauseTimeAfter;
 		public bool clearBeforeThis;
+		public bool movingIntro;
+		//public AnimationCurve introCurve;
 	}
 
 	public textComponent[] messages;
@@ -144,7 +146,8 @@ public class TextController : MonoBehaviour {
 				/**
 				 * textComponent mode
 				 * 
-				 * 
+				 * This puts as much of the text into one text mesh as it can
+				 * so it makes use of the kerning
 				 */
 				if (useTextComponent) {
 					// use the special properties of the textComponents
@@ -157,12 +160,13 @@ public class TextController : MonoBehaviour {
 							for (int t = 0; t < textMeshes.Length; t++) {
 								Destroy (textMeshes [t].gameObject);
 
+								// reset makes it so the y pos goes back to the top
 								reset = true;
 							}
 						}
 
 
-
+						// reset for when the text gets cleared
 						if (textComponentIndex == 0 || reset) {
 							reset = false;
 							wordPos = Vector3.zero;
@@ -174,7 +178,6 @@ public class TextController : MonoBehaviour {
 						if (wordPos.x > maxWidth) {
 							// wrap words
 							// relative to parent so 0
-							//Debug.Log(wordPos.x);
 							wordPos = new Vector3 (0, -lineSpacing * currentLineIndex, 0);
 							currentLineIndex++;
 						}
@@ -225,8 +228,22 @@ public class TextController : MonoBehaviour {
 					// letterIndex < numLetters
 					if (currentLetterIndex <= messages [textComponentIndex].message.Length && (currentTextMesh!= null)) {
 						//Debug.Log (currentLetterIndex + ": " + messages [textComponentIndex].message.Length);
-						currentTextMesh.text = messages [textComponentIndex].message.Substring (0, currentLetterIndex);
+
+						if (messages [textComponentIndex].movingIntro) {
+							// instantiate another textMesh here?
+							// addComponent<SomethingThatControlsItsIntro>()
+							// probably easier than doing it in this update
+							currentTextMesh.text = messages [textComponentIndex].message.Substring (currentLetterIndex-1, 1);
+							currentTextMesh.gameObject.AddComponent<Actor> ();
+							currentTextMesh.GetComponent<Actor> ().startMovingIntro (lastWordPos);
+							lastWordPos = wordPos + new Vector3 (letterSpacing * wordWidth (messages [textComponentIndex].message.Substring (0, currentLetterIndex)), 0, 0);
+							instantiateWord (lastWordPos, "");
+
+						} else {
+							currentTextMesh.text = messages [textComponentIndex].message.Substring (0, currentLetterIndex);
+						}
 						currentLetterIndex++;
+
 					} else {
 						// new section 
 						// move on to next textComponent in the array
