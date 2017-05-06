@@ -78,7 +78,7 @@ public class Actor : MonoBehaviour {
 		startingPos = transform.position;
 		// these are numbers that look right
 		// this is where the letter will spawn in.
-		transform.localPosition = transform.localPosition + new Vector3 (2.8f, 3.7f, 0);
+		transform.localPosition = transform.localPosition + new Vector3 (3.4f, 3.7f, 0);
 		movingIntro = true;
 	}
 }

@@ -163,6 +163,7 @@ public class TextController : MonoBehaviour {
 								// reset makes it so the y pos goes back to the top
 								reset = true;
 							}
+							messages [textComponentIndex].clearBeforeThis = false;
 						}
 
 
@@ -209,7 +210,9 @@ public class TextController : MonoBehaviour {
 
 								if (textComponentIndex > 0) {
 									if (messages [textComponentIndex - 1].spaceAtEnd) {
-										messages [textComponentIndex].message = " " + messages [textComponentIndex].message;
+										// used to need: " " +
+										// appended on so the words didn't run into each other
+										messages [textComponentIndex].message = messages [textComponentIndex].message;
 									}
 								}
 								lastXshift = wordPos.x;
@@ -419,11 +422,14 @@ public class TextController : MonoBehaviour {
 		overFlowWords = null;
 
 		tooBig = false;
+		/*
 		if (messages [textComponentIndex].spaceAtEnd) {
-			return tempMessage;
+			return tempMessage.Remove(tempMessage.Length-1);
 		} else {
 			return tempMessage.Remove(tempMessage.Length-1);
-		}
+		}*/
+		// remove the extra space at the end of the string
+		return tempMessage.Remove (tempMessage.Length - 1);
 	}
 
 	int wordsWidth(string[] words)
