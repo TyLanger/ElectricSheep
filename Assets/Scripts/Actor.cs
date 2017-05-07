@@ -20,9 +20,22 @@ public class Actor : MonoBehaviour {
 	float maxHeight = 5f;
 	bool movingUp = true;
 
+	bool fadingOutro = false;
+	float maxHorSpread = 7f;
+	int horDir = 1;
+	float maxVertDrift = 10f;
+	float outroPercent = 0f;
+	float outroRate = 0.001f;
+	float moveSpeed = 0.2f;
+	Vector3 goalPos;
+	int numTurns = 5;
+	int currentTurn = 1;
+	TextMesh textMesh;
+
 	// Use this for initialization
 	void Start () {
-		originalScale = gameObject.transform.localScale;	
+		originalScale = gameObject.transform.localScale;
+		currentTurn = 1;
 	}
 	
 	// Update is called once per frame
@@ -65,6 +78,78 @@ public class Actor : MonoBehaviour {
 				movingIntro = false;
 			}
 		}
+		if (fadingOutro && !movingIntro) {
+			// don't try to do the fading outro until the movingIntro is over
+
+			// move speed gets slower as you approach the corners
+			// moveSpeed is the base speed of the text moving
+			// (numTurns - currentTurn)/numTurns makes the speed slow down the higher the number of turns
+			// (1.0f - Mathf.Abs (transform.position.x - startingPos.x)/maxHorSpread) makes the text speed up in the middle
+			// it slows down as it approaches the maxHorSpread
+			// abs(trans.x - start.x) is from 0 to maxHorSpread
+			// dividing by maxHor spread makes it from 0 to 1
+			// subtracting from 1.0f swaps it to be from 1 to 0
+			// this gives a greater weight to when trans.x and start.x are close (the center)
+			// and a smaller weight near the corners
+			// plus a small amout so movespeed isn't 0
+			// i.e when numTurns == currentTurn
+			float moveWeight = ((float)(numTurns - currentTurn)/numTurns * (1.0f - Mathf.Abs (transform.position.x - startingPos.x)/(float)maxHorSpread))+0.5f;
+			//Debug.Log (moveWeight);
+			transform.position = Vector3.MoveTowards (transform.position, goalPos, moveSpeed * moveWeight);
+
+
+			// make it shift left and right
+			// when it gets to one side, it switches to the other side
+			// left hand is the distance displaced from the start
+			// when going right, trans.x should be bigger than start.x
+			// horDir is 1 for going right
+			// so this number should approach maxHorSpread which is how far left and right it goes
+			// when going left, trans.x will be smaller than start.x
+			// the subtraction will be negative
+			// horDir is -1 for going left
+			// this makes the number positive so it can be compared to the right side
+			// right side is how far the max is for this turn
+			// as turns goes up, this number gets smaller
+			if((transform.position.x - startingPos.x)*horDir > (maxHorSpread* (numTurns+1 - currentTurn) / numTurns) - 0.1f) {
+				if (textMesh != null) {
+					// fade the a channel out
+					// 1 / numTurns at a time
+					textMesh.color += new Color(0, 0, 0, -1.0f / (float)numTurns);
+					Debug.Log (textMesh.color.a);
+				}
+
+				horDir *= -1;
+				currentTurn++;
+				goalPos = startingPos + new Vector3 (horDir * maxHorSpread* (numTurns+1 - currentTurn) / numTurns, maxVertDrift * currentTurn / numTurns, 0);
+
+			}
+
+			if (currentTurn > numTurns) {
+				// end when it gets to the proper height
+				Debug.Log("stopping");
+				Debug.Log (transform.position);
+				fadingOutro = false;
+			}
+				
+
+
+
+			//transform.position = Vector3.Lerp (transform.position, startingPos + new Vector3((float)maxHorSpread/currentTurn * horDir, (float)currentTurn/numTurns*maxVertDrift, 0), outroPercent);
+			//transform.position += new Vector3((float)maxHorSpread/currentTurn * horDir * (1 - outroPercent), (float)currentTurn/numTurns*maxVertDrift * (1-outroPercent), 0);
+
+			//
+
+			/*
+			outroPercent += outroRate;
+
+			if (outroPercent > 1.0f) {
+				outroPercent = 0;
+				currentTurn++;
+				horDir *= -1;
+			}*/
+			/*
+			*/
+		}
 	}
 
 	public void appear()
@@ -80,5 +165,18 @@ public class Actor : MonoBehaviour {
 		// this is where the letter will spawn in.
 		transform.localPosition = transform.localPosition + new Vector3 (3.4f, 3.7f, 0);
 		movingIntro = true;
+	}
+
+	public void startFadingOutro()
+	{
+		// words appear, then drift upwards and fade out
+		startingPos = transform.position;
+		fadingOutro = true;
+		//goalPos = transform.position + new Vector3 (0, maxVertDrift, 0);
+		goalPos = startingPos + new Vector3 (horDir * maxHorSpread* (numTurns+1 - currentTurn) / numTurns, maxVertDrift * currentTurn / numTurns, 0);
+		//Debug.Log (startingPos);
+		//Debug.Log (goalPos);
+		textMesh = GetComponent<TextMesh> ();
+
 	}
 }

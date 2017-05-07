@@ -20,10 +20,27 @@ public class TextController : MonoBehaviour {
 		public float pauseTimeAfter;
 		public bool clearBeforeThis;
 		public bool movingIntro;
+		public bool movingOutro;
 		//public AnimationCurve introCurve;
+
+		public textComponent(string _message)
+		{
+			message = _message;
+
+			// default values
+			typeSpeed = 0.15f;
+			colour = Color.white;
+			spaceAtEnd = true;
+			pauseTimeAfter = 0f;
+			clearBeforeThis = false;
+			movingIntro = false;
+			movingOutro = false;
+		}
 	}
 
 	public textComponent[] messages;
+	Queue<textComponent> textQueue;
+	int queueMaxSize = 25;
 
 	public Transform cameraTrans;
 	public Director director;
@@ -134,6 +151,23 @@ public class TextController : MonoBehaviour {
 			text.transform.parent = transform;
 			text.text = message;
 		}
+		/*
+		stringQueue = new Queue<string> (20);
+		stringQueue.Enqueue ("Hello");
+		Debug.Log (stringQueue.Peek ());
+		for (int i = 0; i < messages.Length; i++) {
+			stringQueue.Enqueue (messages [i].message);
+		}
+
+		while (stringQueue.Count > 0) {
+			Debug.Log (stringQueue.Dequeue ());
+		}*/
+
+		textQueue = new Queue<textComponent> (queueMaxSize);
+		for (int k = 0; k < messages.Length; k++) {
+			textQueue.Enqueue (messages [k]);
+		}
+
 	}
 	
 	// Update is called once per frame
@@ -248,6 +282,12 @@ public class TextController : MonoBehaviour {
 						currentLetterIndex++;
 
 					} else {
+						// done so now check if it needs an outro
+						if (messages [textComponentIndex].movingOutro) {
+							currentTextMesh.gameObject.AddComponent<Actor> ();
+							currentTextMesh.GetComponent<Actor> ().startFadingOutro ();
+						}
+
 						// new section 
 						// move on to next textComponent in the array
 						if (currentTextMesh != null) {
@@ -265,6 +305,7 @@ public class TextController : MonoBehaviour {
 							timeSinceLastLetter += messages [textComponentIndex].pauseTimeAfter;
 							// tell the director it is done so it can do something if it wants
 							director.textComponentDone (textComponentIndex);
+
 							textComponentIndex++;
 							if (textComponentIndex == messages.Length) {
 
@@ -497,4 +538,13 @@ public class TextController : MonoBehaviour {
 		text.text = letter.ToString();
 	}
 		
+	public void addMessage(string message)
+	{
+		textQueue.Enqueue (new textComponent (message));
+	}
+
+	public void addTextComponent(textComponent tComponent)
+	{
+		textQueue.Enqueue (tComponent);
+	}
 }
