@@ -13,6 +13,7 @@ public struct GridSpace {
 	{
 		maxObjects = _maxObjects;
 		gridObjects = new GridObject[maxObjects];
+		// index is the number of objects in the array
 		index = 0;
 		gridObjects [index] = null;
 	}
@@ -31,11 +32,12 @@ public struct GridSpace {
 				// move the thing in the last position to overwrite this
 				if (index < gridObjects.Length) {
 					// move the last place so that all the objects are in the first indecies
-					gridObjects [i] = gridObjects [index];
+					// index is the number of objects in the array
+					gridObjects [i] = gridObjects [index-1];
 					// set the last object to null for garbage collection
-					gridObjects [index] = null;
+					gridObjects [index-1] = null;
 				} else {
-					// if indec == Length,
+					// if index == Length,
 					// the item is found in the last place
 					// just need to set to null for garbage collection
 					gridObjects [i] = null;
@@ -44,7 +46,10 @@ public struct GridSpace {
 				return true;
 			}
 		}
-		Debug.Log ("Remove failed");
+		Debug.Log ("Remove failed. "+g+" not found. Whole gridObjects array: ");
+		for (int j = 0; j < gridObjects.Length; j++) {
+			Debug.Log(gridObjects[j]);
+		}
 		return false;
 	}
 
@@ -179,12 +184,13 @@ public class Grid : MonoBehaviour {
 		if (outOfBounds (xGrid, zGrid)) {
 			return false;
 		}
+
 		if (grid [xGrid, zGrid].index > 0) {
 			// something is there
 			GridObject[] gos;
 			if (getGridObjectsAtGrid (xGrid, zGrid, out gos)) {
 				for (int i = 0; i < gos.Length; i++) {
-					if (gos [i].GetComponent<Grass> () != null && grid[xGrid, zGrid].index == 1) {
+					if (gos [i].GetComponent<Grass> () != null && grid [xGrid, zGrid].index == 1) {
 						// index is only 1 so
 						// just grass, can walk there
 						//Debug.Log("Moving into grass spot");
@@ -192,6 +198,15 @@ public class Grid : MonoBehaviour {
 					} else if (isSheep && (gos [i].GetComponent<Fence> () != null)) {
 						if (gos [i].GetComponent<Fence> ().broken) {
 							return true;
+						}
+					} else if (isSheep && (gos [i].gridType == GridType.Sheep)) {
+						// it is a sheep and trying to move into another sheep's position
+						if (gos [i].GetComponent<Sheep> () != null) {
+							if (gos [i].GetComponent<Sheep> ().finished) {
+								// the space you're trying to get to has a sheep that is finished
+								// i.e. it has already jumped the fence and this sheep is trying to jump the fence
+								return true;
+							}
 						}
 					}
 				}

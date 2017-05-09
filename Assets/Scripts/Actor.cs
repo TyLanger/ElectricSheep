@@ -126,8 +126,6 @@ public class Actor : MonoBehaviour {
 
 			if (currentTurn > numTurns) {
 				// end when it gets to the proper height
-				Debug.Log("stopping");
-				Debug.Log (transform.position);
 				fadingOutro = false;
 			}
 				

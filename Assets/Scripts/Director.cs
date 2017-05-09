@@ -8,6 +8,21 @@ public class Director : MonoBehaviour {
 	// Like when the creator says something, this handles spawning it in the world
 
 
+
+	[System.Serializable]
+	public struct Level {
+		public LevelLayout[] layout;
+		public int goal;
+	}
+
+	[System.Serializable]
+	public struct LevelLayout {
+		public GridObject gridObject;
+		public Vector2 gridCoords;
+	}
+
+	public Level[] levels;
+
 	public Sheep[] sheep;
 	public Fence[] fence;
 	public Grass grass;
@@ -23,6 +38,17 @@ public class Director : MonoBehaviour {
 	// Update is called once per frame
 	void Update () {
 		
+	}
+
+	void setupLevel(int levelNumber)
+	{
+		for (int i = 0; i < levels[levelNumber].layout.Length; i++) {
+			// move each gridObject to its location
+			levels [levelNumber].layout [i].gridObject.moveToPos ((int)levels [levelNumber].layout [i].gridCoords.x, (int)levels [levelNumber].layout [i].gridCoords.y);
+			// hide the object until the level starts
+			levels [levelNumber].layout [i].gridObject.hide();
+		}
+
 	}
 
 	public void textComponentDone(int index)
@@ -51,7 +77,8 @@ public class Director : MonoBehaviour {
 			break;
 
 		case 7:
-			player.gameObject.SetActive (true);
+			//player.gameObject.SetActive (true);
+			player.unHide ();
 			break;
 
 		case 15:
@@ -78,8 +105,15 @@ public class Director : MonoBehaviour {
 			Invoke ("returnPlayerControl", 1);
 			break;
 		case 1:
+			player.canMove = false;
 			grass.gameObject.SetActive (true);
-
+			// eat the grass so it starts out by growing
+			grass.eatGrass ();
+			for (int i = 0; i < sheep.Length; i++) {
+				sheep [i].moveToPos (i + 2, i + 1);
+			}
+			Invoke ("activateAllSheep", 1);
+			Invoke ("returnPlayerControl", 1);
 			break;
 
 		}

@@ -32,7 +32,7 @@ public class GridObject : MonoBehaviour {
 		}
 	}
 
-	public void moveToPos(int xPos, int zPos)
+	public virtual void moveToPos(int xPos, int zPos)
 	{
 		if (grid.gridToVec3 (xPos, zPos, out movePos)) {
 			transform.position = movePos;
@@ -57,5 +57,18 @@ public class GridObject : MonoBehaviour {
 			xGridPos += xDelta;
 			zGridPos += zDelta;
 		}
+	}
+
+	public virtual void hide()
+	{
+		// base hide just sets its gameobject to not active
+		// other vversions could change some functionality
+		// like the player no longer takes input so the player can't move
+		gameObject.SetActive(false);
+	}
+
+	public virtual void unHide()
+	{
+		gameObject.SetActive (true);
 	}
 }

@@ -22,7 +22,7 @@ public class Grass : GridObject {
 	// Update is called once per frame
 	void Update () {
 		if (eaten) {
-			// make the grass get bigger as is grows back
+			// make the grass get bigger as it grows back
 			transform.localScale = new Vector3 (regrowCurve.Evaluate((Time.time - timeEatenAt) / regrowTime) * originalHeight, regrowCurve.Evaluate((Time.time - timeEatenAt) / regrowTime) * originalHeight, (Time.time - timeEatenAt) / regrowTime * originalHeight);
 			if (Time.time > timeEatenAt + regrowTime) {
 				regrowGrass ();

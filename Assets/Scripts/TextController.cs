@@ -4,6 +4,8 @@ using UnityEngine;
 
 public class TextController : MonoBehaviour {
 
+	public enum TextMode { Scripted, Periodic, Triggered};
+
 	// struct to handle different parts of text doing different things
 	// i.e. moving, changing colour, etc.
 	[System.Serializable]
@@ -77,9 +79,11 @@ public class TextController : MonoBehaviour {
 	int spacing;
 	char[] letter;
 
+	public TextMode textMode;
 	public bool typeOverTime = false;
 	public bool wordMode = false;
 	public float typeSpeed = 1;
+	float baseTypeSpeed;
 	float timeSinceLastLetter = 0;
 	int letterIndex;
 	public bool useTextComponent = false;
@@ -103,7 +107,7 @@ public class TextController : MonoBehaviour {
 		lastWordPos = Vector3.zero;
 		wordPos = Vector3.zero;
 		words = message.Split (new char[]{ ' ' }, 30); 
-
+		baseTypeSpeed = typeSpeed;
 
 		// the characters in the message in alphabetical order
 		charInfo = textMesh.font.characterInfo;
@@ -195,6 +199,7 @@ public class TextController : MonoBehaviour {
 								Destroy (textMeshes [t].gameObject);
 
 								// reset makes it so the y pos goes back to the top
+								// for when all messages are cleared
 								reset = true;
 							}
 							messages [textComponentIndex].clearBeforeThis = false;
@@ -239,6 +244,7 @@ public class TextController : MonoBehaviour {
 								// only long enough with the wordPos.x
 								// start of this message finishes off the last line.
 
+								/* Don't need this anymore
 								// append a space so the words don't run together
 								// but only if the previous word wanted a space after
 
@@ -248,14 +254,14 @@ public class TextController : MonoBehaviour {
 										// appended on so the words didn't run into each other
 										messages [textComponentIndex].message = messages [textComponentIndex].message;
 									}
-								}
+								}*/
 								lastXshift = wordPos.x;
 							} else {
 								lastXshift = 0;
 							}
 						}
 
-						typeSpeed = messages [textComponentIndex].typeSpeed;
+						typeSpeed = baseTypeSpeed + messages [textComponentIndex].typeSpeed;
 
 						instantiateWord (wordPos, messages [textComponentIndex].message);
 						currentTextMesh.color = messages [textComponentIndex].colour;
@@ -264,12 +270,12 @@ public class TextController : MonoBehaviour {
 					// draw the next letter
 					// letterIndex < numLetters
 					if (currentLetterIndex <= messages [textComponentIndex].message.Length && (currentTextMesh!= null)) {
-						//Debug.Log (currentLetterIndex + ": " + messages [textComponentIndex].message.Length);
 
 						if (messages [textComponentIndex].movingIntro) {
-							// instantiate another textMesh here?
-							// addComponent<SomethingThatControlsItsIntro>()
-							// probably easier than doing it in this update
+							// instantiate another textMesh here
+							// addComponent<Actor>()
+							// Actor's update handles the movement
+							// make each letter its own textMesh so they can move independantely
 							currentTextMesh.text = messages [textComponentIndex].message.Substring (currentLetterIndex-1, 1);
 							currentTextMesh.gameObject.AddComponent<Actor> ();
 							currentTextMesh.GetComponent<Actor> ().startMovingIntro (lastWordPos);
@@ -282,7 +288,7 @@ public class TextController : MonoBehaviour {
 						currentLetterIndex++;
 
 					} else {
-						// done so now check if it needs an outro
+						// done printing all letters so now check if it needs an outro
 						if (messages [textComponentIndex].movingOutro) {
 							currentTextMesh.gameObject.AddComponent<Actor> ();
 							currentTextMesh.GetComponent<Actor> ().startFadingOutro ();
@@ -297,7 +303,7 @@ public class TextController : MonoBehaviour {
 
 						if (tooBig) {
 							// if it was too big to fit into one textMesh
-							// dont move on to the next textComponent yet
+							// don't move on to the next textComponent yet
 							tooBig = false;
 
 						} else {
@@ -308,12 +314,13 @@ public class TextController : MonoBehaviour {
 
 							textComponentIndex++;
 							if (textComponentIndex == messages.Length) {
-
+								
 								typeOverTime = false;
 							}
 							else if(messages[textComponentIndex].clearBeforeThis)
 							{
 								currentLineIndex = 1;
+								// give some time to read the messages before clearing them
 								timeSinceLastLetter += clearDelay;
 							}
 
@@ -508,8 +515,11 @@ public class TextController : MonoBehaviour {
 	void instantiateWord(Vector3 position, Quaternion rotation, string word)
 	{
 		// create the word as an object
+		//Debug.Log(transform.position + " " + position);
 		var text = Instantiate (textMesh, transform.position + position, rotation) as TextMesh;
 		text.transform.parent = transform;
+		text.transform.position += new Vector3(0, 0, -text.transform.localPosition.z/2f);
+		//text.transform.localPosition = position;
 		text.text = word;
 		// change the anchor so that when the text gets typed out,
 		// it appears to the right end of the word
@@ -547,4 +557,11 @@ public class TextController : MonoBehaviour {
 	{
 		textQueue.Enqueue (tComponent);
 	}
+
+	void updateCurrentTextMesh(int numLetters)
+	{
+		currentTextMesh.text = messages [textComponentIndex].message.Substring (0, numLetters);
+	}
+
+
 }

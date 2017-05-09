@@ -11,6 +11,9 @@ public class Sheep : GridObject {
 	public GridObject foundGrass;
 	public GridObject foundFence;
 
+	// this sheep has hopped the fence
+	public bool finished = false;
+
 	protected override void Start()
 	{
 		base.Start ();
@@ -22,6 +25,13 @@ public class Sheep : GridObject {
 		
 
 		transform.position = Vector3.MoveTowards (transform.position, movePos, moveSpeed);
+	}
+
+	public override void moveToPos(int xPos, int zPos)
+	{
+		base.moveToPos (xPos, zPos);
+		// to move the sheep back into the game
+		finished = false;
 	}
 
 	public override void move(int xDelta, int zDelta)
@@ -46,15 +56,20 @@ public class Sheep : GridObject {
 			checkForGrass ();
 		}
 	}
-
+		
 	public void hopFence(int xPos, int zPos)
 	{
-		// positon sheep will be after fence jump
-		if (grid.gridToVec3 (xPos, zPos, out tempMovePos)) {
-			movePos = tempMovePos;
-			scoreController.increaseScore (1);
-			//TODO play a jump animation to make it look like you're not just passing right through the fence
-		}
+		// hop over the fence by moving 1 up
+		move (0, 1);
+		finished = true;
+		// increment your score
+		// give some time so the sheep can reach its destination
+		Invoke("increaseScore", 1);
+	}
+
+	void increaseScore()
+	{
+		scoreController.increaseScore (1);
 	}
 
 	bool checkForFence()
